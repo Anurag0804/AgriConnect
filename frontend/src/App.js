@@ -8,6 +8,10 @@ import DashboardCustomer from "./pages/DashboardCustomer";
 import DashboardFarmer from "./pages/DashboardFarmer";
 import DashboardAdmin from "./pages/DashboardAdmin";
 import ProtectedRoute from "./components/ProtectedRoute";
+import PurchaseHistory from "./pages/PurchaseHistory";
+import CustomerInventory from "./pages/CustomerInventory";
+import FarmerHistory from "./pages/FarmerHistory";
+import Profile from "./pages/Profile"; // Import new page
 
 function App() {
   return (
@@ -19,7 +23,16 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route
+              path="/profile" // Add new route
+              element={
+                <ProtectedRoute roles={["customer", "farmer", "agency", "admin"]}>
+                  <Profile />
+                </ProtectedRoute>
+              }
+            />
 
+            {/* Customer Routes */}
             <Route
               path="/customer"
               element={
@@ -29,6 +42,24 @@ function App() {
               }
             />
             <Route
+              path="/history/customer"
+              element={
+                <ProtectedRoute roles={["customer"]}>
+                  <PurchaseHistory />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/inventory/customer"
+              element={
+                <ProtectedRoute roles={["customer"]}>
+                  <CustomerInventory />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Farmer Routes */}
+            <Route
               path="/farmer"
               element={
                 <ProtectedRoute roles={["farmer"]}>
@@ -37,9 +68,19 @@ function App() {
               }
             />
             <Route
+              path="/history/farmer"
+              element={
+                <ProtectedRoute roles={["farmer"]}>
+                  <FarmerHistory />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Admin/Agency Routes */}
+            <Route
               path="/admin"
               element={
-                <ProtectedRoute roles={["admin"]}>
+                <ProtectedRoute roles={["agency", "admin"]}>
                   <DashboardAdmin />
                 </ProtectedRoute>
               }

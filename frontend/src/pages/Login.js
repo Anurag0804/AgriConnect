@@ -1,15 +1,32 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { login } from "../services/authService";
 
 export default function Login() {
-  const [form, setForm] = useState({ email: "", password: "" });
+  const [form, setForm] = useState({ phone: "", password: "" });
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Login form:", form);
+    setError("");
+    setLoading(true);
+    try {
+      const { role } = await login(form);
+      // Navigate based on role
+      if (role === 'customer') navigate('/customer');
+      else if (role === 'farmer') navigate('/farmer');
+      else if (role === 'agency') navigate('/admin'); // Assuming agency maps to admin dashboard
+      else navigate('/');
+    } catch (err) {
+      setError(err.response?.data?.error || "An error occurred during login.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -25,12 +42,12 @@ export default function Login() {
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email Address
+              Phone Number
             </label>
             <input
-              type="email"
-              name="email"
-              placeholder="you@example.com"
+              type="text" // Changed from email to text for phone number
+              name="phone"
+              placeholder="Your 10-digit phone number"
               onChange={handleChange}
               className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
               required
@@ -51,11 +68,14 @@ export default function Login() {
             />
           </div>
 
+          {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+
           <button
             type="submit"
-            className="w-full bg-green-600 text-white py-2 rounded-lg shadow-md hover:bg-green-700 transition"
+            className="w-full bg-green-600 text-white py-2 rounded-lg shadow-md hover:bg-green-700 transition disabled:bg-gray-400"
+            disabled={loading}
           >
-            Login
+            {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
 
