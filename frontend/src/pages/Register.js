@@ -1,20 +1,38 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { register } from "../services/authService";
 
 export default function Register() {
   const [form, setForm] = useState({
-    name: "",
-    email: "",
+    username: "",
+    phone: "",
     password: "",
     role: "customer",
   });
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState("");
+  const navigate = useNavigate();
 
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Register form:", form);
+    setError("");
+    setSuccess("");
+    setLoading(true);
+    try {
+      await register(form);
+      setSuccess("Registration successful! Redirecting to login...");
+      setTimeout(() => {
+        navigate("/login");
+      }, 2000);
+    } catch (err) {
+      setError(err.response?.data?.error || "An error occurred during registration.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -30,11 +48,11 @@ export default function Register() {
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Full Name
+              Username
             </label>
             <input
               type="text"
-              name="name"
+              name="username"
               placeholder="John Doe"
               onChange={handleChange}
               className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
@@ -44,12 +62,12 @@ export default function Register() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email Address
+              Phone Number
             </label>
             <input
-              type="email"
-              name="email"
-              placeholder="you@example.com"
+              type="text"
+              name="phone"
+              placeholder="Your 10-digit phone number"
               onChange={handleChange}
               className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
               required
@@ -72,24 +90,29 @@ export default function Register() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Role
+              I am a...
             </label>
             <select
               name="role"
+              value={form.role}
               onChange={handleChange}
               className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
             >
               <option value="customer">Customer</option>
               <option value="farmer">Farmer</option>
-              <option value="admin">Admin</option>
+              <option value="agency">Agency</option>
             </select>
           </div>
 
+          {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+          {success && <p className="text-green-500 text-sm text-center">{success}</p>}
+
           <button
             type="submit"
-            className="w-full bg-yellow-500 text-gray-900 py-2 rounded-lg shadow-md hover:bg-yellow-600 transition"
+            className="w-full bg-yellow-500 text-gray-900 py-2 rounded-lg shadow-md hover:bg-yellow-600 transition disabled:bg-gray-400"
+            disabled={loading}
           >
-            Register
+            {loading ? 'Registering...' : 'Register'}
           </button>
         </form>
 
