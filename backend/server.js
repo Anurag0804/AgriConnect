@@ -8,8 +8,11 @@ const transactionRoutes = require('./routes/transactionRoutes');
 const inventoryRoutes = require('./routes/inventoryRoutes');
 const cors = require('cors');
 
-// Load env
-dotenv.config();
+// Load env from the same directory as server.js
+dotenv.config({ path: __dirname + '/.env' });
+
+// Debug: Print to verify env is loaded
+console.log("MONGO_URI Loaded:", process.env.MONGO_URI);
 
 // Connect DB
 connectDB();
