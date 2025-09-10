@@ -36,7 +36,7 @@ export default function Navbar() {
     if (!user) return "bg-primary";
     switch (user.role) {
       case 'customer':
-        return 'bg-primary';
+        return 'bg-prim';
       case 'farmer':
         return 'bg-yellow-500';
       default:
