@@ -1,7 +1,30 @@
-import { Link } from "react-router-dom";
+import { useEffect } from 'react';
+import { Link, useNavigate } from "react-router-dom";
+import { getCurrentUser } from "../services/authService";
 import { Users, Leaf, Shield } from "lucide-react"; // icons
 
 export default function Home() {
+  const navigate = useNavigate();
+  const user = getCurrentUser();
+
+  useEffect(() => {
+    if (user) {
+      switch (user.role) {
+        case 'customer':
+          navigate('/customer');
+          break;
+        case 'farmer':
+          navigate('/farmer');
+          break;
+        case 'agency':
+          navigate('/admin');
+          break;
+        default:
+          navigate('/');
+      }
+    }
+  }, [user, navigate]);
+
   return (
     <div className="bg-gradient-to-r from-green-100 via-yellow-50 to-green-50 min-h-screen flex flex-col">
       {/* Hero Section */}

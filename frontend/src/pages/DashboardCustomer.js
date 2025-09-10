@@ -1,9 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { getCrops } from '../services/cropService';
-import { buyCrop } from '../services/transactionService';
+import { createOrder } from '../services/orderService';
+import GlobalContext from '../context/GlobalState';
+import { ShoppingCart } from 'lucide-react';
 
 export default function DashboardCustomer() {
+  const { fetchData } = useContext(GlobalContext);
   const [crops, setCrops] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -42,13 +45,14 @@ export default function DashboardCustomer() {
     }
 
     try {
-      await buyCrop(crop._id, quantityNum);
-      alert('Purchase successful!');
+      await createOrder({ crop: crop._id, farmer: crop.farmer._id, quantity: quantityNum, totalPrice: quantityNum * crop.pricePerKg });
+      alert('Order placed successfully!');
       // Refresh the crop list to show updated stock
-      fetchCrops(); 
+      fetchCrops();
+      fetchData();
     } catch (err) {
       const errorMessage = err.response?.data?.error || 'An error occurred during the purchase.';
-      alert(`Purchase failed: ${errorMessage}`);
+      alert(`Order failed: ${errorMessage}`);
       console.error(err);
     }
   };
@@ -67,7 +71,8 @@ export default function DashboardCustomer() {
         <h1 className="text-3xl font-bold text-primary">Marketplace</h1>
         <div>
           <Link to="/inventory/customer" className="bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700 transition mr-2">
-            My Inventory
+            <ShoppingCart className="inline-block mr-2" />
+            My Cart
           </Link>
           <Link to="/history/customer" className="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition">
             Purchase History

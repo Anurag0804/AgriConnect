@@ -42,7 +42,7 @@ export default function Register() {
           Create Account ✨
         </h2>
         <p className="text-center text-gray-500 mb-6">
-          Join <span className="font-semibold">MandiHub</span> today
+          Join <span className="font-semibold">AgriConnect</span> today
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-5">

@@ -12,6 +12,9 @@ import PurchaseHistory from "./pages/PurchaseHistory";
 import CustomerInventory from "./pages/CustomerInventory";
 import FarmerHistory from "./pages/FarmerHistory";
 import Profile from "./pages/Profile"; // Import new page
+import Orders from "./pages/Orders";
+import OrderConfirmations from "./pages/OrderConfirmations";
+import Receipts from "./pages/Receipts";
 
 function App() {
   return (
@@ -82,6 +85,32 @@ function App() {
               element={
                 <ProtectedRoute roles={["agency", "admin"]}>
                   <DashboardAdmin />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Order Routes */}
+            <Route
+              path="/orders"
+              element={
+                <ProtectedRoute roles={["customer", "farmer"]}>
+                  <Orders />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/order-confirmations"
+              element={
+                <ProtectedRoute roles={["customer", "farmer"]}>
+                  <OrderConfirmations />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/receipts"
+              element={
+                <ProtectedRoute roles={["customer", "farmer"]}>
+                  <Receipts />
                 </ProtectedRoute>
               }
             />

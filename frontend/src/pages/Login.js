@@ -36,7 +36,7 @@ export default function Login() {
           Welcome Back 👋
         </h2>
         <p className="text-center text-gray-500 mb-6">
-          Login to continue to <span className="font-semibold">MandiHub</span>
+          Login to continue to <span className="font-semibold">AgriConnect</span>
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-5">

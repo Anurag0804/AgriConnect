@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { createCrop, getFarmerCrops } from '../services/cropService';
-import { getFarmerHistory } from '../services/transactionService';
+import { getFarmerTransactions } from '../services/transactionService';
 import { getCurrentUser } from '../services/authService';
+import { ArrowUpFromLine } from 'lucide-react';
 
 export default function DashboardFarmer() {
   const [crops, setCrops] = useState([]);
@@ -26,7 +27,7 @@ export default function DashboardFarmer() {
       setLoading(true);
       const [cropsData, historyData] = await Promise.all([
         getFarmerCrops(currentUser.userId),
-        getFarmerHistory()
+        getFarmerTransactions()
       ]);
       setCrops(cropsData);
       setHistory(historyData);
@@ -150,6 +151,7 @@ export default function DashboardFarmer() {
               type="submit"
               className="w-full bg-primary text-white py-2 rounded-lg shadow-md hover:bg-green-700 transition"
             >
+              <ArrowUpFromLine className="inline-block mr-2" />
               Submit Crop Data
             </button>
           </form>
