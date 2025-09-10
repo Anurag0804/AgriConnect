@@ -32,3 +32,18 @@ export const getFarmerTransactions = async () => {
   const res = await axios.get(API_URL + 'history/farmer', { headers });
   return res.data;
 };
+
+export const buyCrop = async (cropId, quantity) => {
+  const headers = getAuthHeader();
+  if (!headers.Authorization) {
+    throw new Error('No authorization token found. Please log in.');
+  }
+
+  const res = await axios.post(
+    API_URL + 'buy',
+    { cropId, quantity },
+    { headers }
+  );
+
+  return res.data;
+};
