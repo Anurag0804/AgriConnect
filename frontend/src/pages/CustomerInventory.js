@@ -1,39 +1,21 @@
-import { useState, useEffect } from 'react';
-import { getCustomerInventory } from '../services/inventoryService';
+import { useContext } from 'react';
+import GlobalContext from '../context/GlobalState';
 import { Link } from 'react-router-dom';
 
 export default function CustomerInventory() {
-  const [inventory, setInventory] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-
-  useEffect(() => {
-    const fetchInventory = async () => {
-      try {
-        const data = await getCustomerInventory();
-        setInventory(data);
-      } catch (err) {
-        setError('Failed to fetch inventory.');
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchInventory();
-  }, []);
+  const { inventory, loading, error } = useContext(GlobalContext);
 
   if (loading) {
-    return <div className="text-center p-8">Loading your inventory...</div>;
+    return <div className="text-center p-8">Loading your cart...</div>;
   }
 
   if (error) {
-    return <div className="text-center p-8 text-red-500">{error}</div>;
+    return <div className="text-center p-8 text-red-500">{error.message}</div>;
   }
 
   return (
     <div className="container mx-auto">
-      <h1 className="text-3xl font-bold text-primary mb-6">My Inventory</h1>
+      <h1 className="text-3xl font-bold text-primary mb-6">My Cart</h1>
       <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
         {inventory.length > 0 ? (
           <table className="w-full text-left">
@@ -55,7 +37,7 @@ export default function CustomerInventory() {
             </tbody>
           </table>
         ) : (
-          <p>Your inventory is empty. Visit the marketplace to buy crops!</p>
+          <p>Your cart is empty. Visit the marketplace to buy crops!</p>
         )}
       </div>
       <div className="mt-6">

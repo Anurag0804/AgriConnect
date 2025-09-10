@@ -13,18 +13,8 @@ const getAuthHeader = () => {
   }
 };
 
-// Buy a crop
-export const buyCrop = async (cropId, quantity) => {
-  const headers = getAuthHeader();
-  if (!headers.Authorization) {
-    throw new Error('No authorization token found. Please log in.');
-  }
-  const res = await axios.post(API_URL, { cropId, quantity }, { headers });
-  return res.data;
-};
-
 // Get purchase history for the logged-in customer
-export const getCustomerHistory = async () => {
+export const getCustomerTransactions = async () => {
   const headers = getAuthHeader();
   if (!headers.Authorization) {
     throw new Error('No authorization token found. Please log in.');
@@ -34,7 +24,7 @@ export const getCustomerHistory = async () => {
 };
 
 // Get sales history for the logged-in farmer
-export const getFarmerHistory = async () => {
+export const getFarmerTransactions = async () => {
   const headers = getAuthHeader();
   if (!headers.Authorization) {
     throw new Error('No authorization token found. Please log in.');
