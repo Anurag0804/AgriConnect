@@ -13,9 +13,9 @@ const getAuthHeader = () => {
   }
 };
 
-// Get all available crops for the marketplace
-export const getCrops = async () => {
-  const res = await axios.get(API_URL);
+// Get all available crops for the marketplace with filtering
+export const getCrops = async (params) => {
+  const res = await axios.get(API_URL, { params });
   return res.data;
 };
 
