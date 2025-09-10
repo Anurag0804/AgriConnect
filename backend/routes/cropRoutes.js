@@ -23,12 +23,59 @@ router.post('/', protect, authorize('farmer'), async (req, res) => {
   }
 });
 
-// @desc    Get all crop listings for the marketplace
+// @desc    Get all crop listings for the marketplace with search and filtering
 // @route   GET /api/crops
 // @access  Public
 router.get('/', async (req, res) => {
   try {
-    const crops = await Crop.find({ stock: { $gt: 0 } }).populate('farmer', 'username address');
+    const { search, location, minPrice, maxPrice, sortBy } = req.query;
+
+    let query = { stock: { $gt: 0 } };
+
+    if (search) {
+      query.name = { $regex: search, $options: 'i' }; // Case-insensitive search
+    }
+    if (location) {
+      query.location = { $regex: location, $options: 'i' };
+    }
+    if (minPrice || maxPrice) {
+      query.pricePerKg = {};
+      if (minPrice) {
+        query.pricePerKg.$gte = parseFloat(minPrice);
+      }
+      if (maxPrice) {
+        query.pricePerKg.$lte = parseFloat(maxPrice);
+      }
+    }
+
+    let sortOptions = {};
+    if (sortBy) {
+      switch (sortBy) {
+        case 'price_asc':
+          sortOptions.pricePerKg = 1;
+          break;
+        case 'price_desc':
+          sortOptions.pricePerKg = -1;
+          break;
+        case 'name_asc':
+          sortOptions.name = 1;
+          break;
+        case 'name_desc':
+          sortOptions.name = -1;
+          break;
+        default:
+          // For relevance or default, no specific sort or sort by date
+          sortOptions.createdAt = -1;
+          break;
+      }
+    } else {
+      sortOptions.createdAt = -1; // Default sort by newest
+    }
+
+    const crops = await Crop.find(query)
+      .populate('farmer', 'username address')
+      .sort(sortOptions);
+      
     res.json(crops);
   } catch (error) {
     res.status(500).json({ error: 'Server Error' });
