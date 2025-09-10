@@ -36,7 +36,7 @@ export default function Navbar() {
     if (!user) return "bg-primary";
     switch (user.role) {
       case 'customer':
-        return 'bg-prim';
+        return 'bg-primary';
       case 'farmer':
         return 'bg-yellow-500';
       default:
@@ -75,8 +75,8 @@ export default function Navbar() {
                   <Link to="/receipts" className="block hover:text-secondary">Receipts</Link>
                 </div>
               </div>
-              <button 
-                onClick={handleLogout} 
+              <button
+                onClick={handleLogout}
                 className="bg-accent hover:bg-orange-600 text-white font-bold py-2 px-3 rounded-lg transition"
               >
                 <LogOut className="inline-block mr-2" />
