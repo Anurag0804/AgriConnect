@@ -1,7 +1,10 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 const Order = require('../models/Order');
 const Transaction = require('../models/Transaction');
+const Crop = require('../models/Crop');
+const Inventory = require('../models/Inventory');
 const { protect, authorize } = require('../middleware/authMiddleware');
 
 // @desc    Create a new order
@@ -52,34 +55,81 @@ router.get('/customer', protect, authorize('customer'), async (req, res) => {
 // @route   PUT /api/orders/:id
 // @access  Private (Farmer)
 router.put('/:id', protect, authorize('farmer'), async (req, res) => {
+  const { status } = req.body;
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
-    const { status } = req.body;
-    const order = await Order.findById(req.params.id);
+    const order = await Order.findById(req.params.id).session(session);
 
-    if (order) {
-      if (order.farmer.toString() !== req.user.id) {
-        return res.status(403).json({ error: 'Not authorized to update this order' });
-      }
-      order.status = status;
-      const updatedOrder = await order.save();
-
-      if (status === 'confirmed') {
-        const transaction = new Transaction({
-          crop: order.crop,
-          farmer: order.farmer,
-          customer: order.customer,
-          quantity: order.quantity,
-          totalPrice: order.totalPrice,
-        });
-        await transaction.save();
-      }
-
-      res.json(updatedOrder);
-    } else {
-      res.status(404).json({ error: 'Order not found' });
+    if (!order) {
+      throw new Error('Order not found');
     }
+    if (order.farmer.toString() !== req.user.id) {
+      throw new Error('Not authorized to update this order');
+    }
+    if (order.status !== 'pending') {
+      throw new Error(`Order is already ${order.status}`);
+    }
+
+    order.status = status;
+
+    if (status === 'confirmed') {
+      const crop = await Crop.findById(order.crop).session(session);
+      if (!crop) {
+        throw new Error('Crop not found');
+      }
+      if (crop.stock < order.quantity) {
+        throw new Error('Not enough stock available');
+      }
+
+      // 1. Create the transaction
+      const transaction = new Transaction({
+        crop: order.crop,
+        farmer: order.farmer,
+        customer: order.customer,
+        quantity: order.quantity,
+        totalPrice: order.totalPrice,
+      });
+      await transaction.save({ session });
+
+      // 2. Decrease crop stock
+      crop.stock -= order.quantity;
+      await crop.save({ session });
+
+      // 3. Update or create customer inventory
+      const inventoryItem = await Inventory.findOne({ customer: order.customer, cropName: crop.name }).session(session);
+      if (inventoryItem) {
+        inventoryItem.weight += order.quantity;
+        await inventoryItem.save({ session });
+      } else {
+        await Inventory.create([{
+          customer: order.customer,
+          cropName: crop.name,
+          weight: order.quantity,
+          purchasePrice: crop.pricePerKg,
+        }], { session });
+      }
+    }
+
+    const updatedOrder = await order.save({ session });
+
+    await session.commitTransaction();
+    session.endSession();
+
+    res.json(updatedOrder);
+
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    await session.abortTransaction();
+    session.endSession();
+    // Determine status code based on error
+    if (error.message.includes('Not authorized') || error.message.includes('already')) {
+      res.status(403).json({ error: error.message });
+    } else if (error.message.includes('not found')) {
+      res.status(404).json({ error: error.message });
+    } else {
+      res.status(400).json({ error: error.message });
+    }
   }
 });
 

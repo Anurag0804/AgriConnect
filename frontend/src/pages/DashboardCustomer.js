@@ -84,17 +84,10 @@ export default function DashboardCustomer() {
 
     try {
       await createOrder({ crop: crop._id, farmer: crop.farmer._id, quantity: quantityNum, totalPrice: quantityNum * crop.pricePerKg });
-      alert('Order placed successfully!');
-      // Refresh the crop list to show updated stock
+      alert('Order placed successfully! The farmer will confirm your order shortly.');
       fetchCrops();
-      fetchData();
-
-      await buyCrop(crop._id, quantityNum);
-      alert('Purchase successful!');
-      fetchCrops(); 
-
     } catch (err) {
-      const errorMessage = err.response?.data?.error || 'An error occurred during the purchase.';
+      const errorMessage = err.response?.data?.error || 'An error occurred while placing the order.';
       alert(`Order failed: ${errorMessage}`);
       console.error(err);
     }

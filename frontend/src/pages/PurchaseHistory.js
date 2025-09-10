@@ -9,15 +9,13 @@ export default function PurchaseHistory() {
     return <div className="text-center p-8">Loading purchase history...</div>;
   }
 
-  if (error) {
-    return <div className="text-center p-8 text-red-500">{error.message}</div>;
-  }
-
   return (
     <div className="container mx-auto">
       <h1 className="text-3xl font-bold text-primary mb-6">My Purchase History</h1>
       <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-        {transactions.length > 0 ? (
+        {!transactions || transactions.length === 0 ? (
+          <p>You have no purchases.</p>
+        ) : (
           <table className="w-full text-left">
             <thead>
               <tr className="border-b-2 border-gray-200">
@@ -40,8 +38,6 @@ export default function PurchaseHistory() {
               ))}
             </tbody>
           </table>
-        ) : (
-          <p>You have no purchase history.</p>
         )}
       </div>
       <div className="mt-6">

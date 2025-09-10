@@ -40,7 +40,7 @@ export const buyCrop = async (cropId, quantity) => {
   }
 
   const res = await axios.post(
-    API_URL + 'buy',
+    API_URL,
     { cropId, quantity },
     { headers }
   );

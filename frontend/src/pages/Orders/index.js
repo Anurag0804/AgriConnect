@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import GlobalContext from '../../context/GlobalState';
 import { updateOrderStatus } from '../../services/orderService';
 import { getCurrentUser } from '../../services/authService';
@@ -6,6 +6,10 @@ import { getCurrentUser } from '../../services/authService';
 export default function Orders() {
   const { orders, loading, error, fetchData } = useContext(GlobalContext);
   const currentUser = getCurrentUser();
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const handleUpdateStatus = async (orderId, status) => {
     try {
@@ -21,9 +25,9 @@ export default function Orders() {
       <h1 className="text-3xl font-bold text-primary mb-6">My Orders</h1>
       {loading ? (
         <p>Loading orders...</p>
-      ) : error ? (
-        <p className="text-red-500">{error.message}</p>
-      ) : orders.length > 0 ? (
+      ) : !orders || orders.length === 0 ? (
+        <p>You have no orders.</p>
+      ) : (
         <table className="w-full text-left">
           <thead>
             <tr className="border-b-2 border-gray-200">
@@ -31,7 +35,7 @@ export default function Orders() {
               <th className="py-2 px-4">Quantity (kg)</th>
               <th className="py-2 px-4">Total Price</th>
               <th className="py-2 px-4">Status</th>
-              {currentUser.role === 'farmer' && <th className="py-2 px-4">Actions</th>}
+              {currentUser && currentUser.role === 'farmer' && <th className="py-2 px-4">Actions</th>}
             </tr>
           </thead>
           <tbody>
@@ -41,7 +45,7 @@ export default function Orders() {
                 <td className="py-2 px-4">{order.quantity}</td>
                 <td className="py-2 px-4">₹{order.totalPrice}</td>
                 <td className="py-2 px-4">{order.status}</td>
-                {currentUser.role === 'farmer' && (
+                {currentUser && currentUser.role === 'farmer' && (
                   <td className="py-2 px-4">
                     {order.status === 'pending' && (
                       <>
@@ -65,8 +69,6 @@ export default function Orders() {
             ))}
           </tbody>
         </table>
-      ) : (
-        <p>You have no orders.</p>
       )}
     </div>
   );

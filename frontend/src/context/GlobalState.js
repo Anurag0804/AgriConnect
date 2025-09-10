@@ -1,4 +1,4 @@
-import React, { createContext, useReducer, useEffect } from 'react';
+import React, { createContext, useReducer, useEffect, useCallback } from 'react';
 import { getOrders, getTransactions, getInventory } from '../services/api'; // Assuming you have an api service
 
 const initialState = {
@@ -33,7 +33,7 @@ const globalReducer = (state, action) => {
 export const GlobalProvider = ({ children }) => {
   const [state, dispatch] = useReducer(globalReducer, initialState);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       const [orders, transactions, inventory] = await Promise.all([
         getOrders(),
@@ -44,11 +44,11 @@ export const GlobalProvider = ({ children }) => {
     } catch (error) {
       dispatch({ type: 'FETCH_ERROR', payload: error });
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   return (
     <GlobalContext.Provider value={{ ...state, fetchData }}>

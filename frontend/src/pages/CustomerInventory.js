@@ -9,15 +9,13 @@ export default function CustomerInventory() {
     return <div className="text-center p-8">Loading your cart...</div>;
   }
 
-  if (error) {
-    return <div className="text-center p-8 text-red-500">{error.message}</div>;
-  }
-
   return (
     <div className="container mx-auto">
       <h1 className="text-3xl font-bold text-primary mb-6">My Cart</h1>
       <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-        {inventory.length > 0 ? (
+        {!inventory || inventory.length === 0 ? (
+          <p>Your Cart is Empty.</p>
+        ) : (
           <table className="w-full text-left">
             <thead>
               <tr className="border-b-2 border-gray-200">
@@ -36,8 +34,6 @@ export default function CustomerInventory() {
               ))}
             </tbody>
           </table>
-        ) : (
-          <p>Your cart is empty. Visit the marketplace to buy crops!</p>
         )}
       </div>
       <div className="mt-6">
