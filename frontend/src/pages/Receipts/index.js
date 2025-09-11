@@ -1,6 +1,5 @@
-// ... existing imports
 import { useState, useEffect } from 'react';
-import { getAllReceipts, updateReceiptStatus } from '../../services/receiptService';
+import { getCustomerReceipts, getFarmerReceipts, updateReceiptStatus } from '../../services/receiptService';
 import { getCurrentUser } from '../../services/authService';
 
 export default function Receipts() {
@@ -12,9 +11,14 @@ export default function Receipts() {
   const fetchReceipts = async () => {
     try {
       setLoading(true);
-      const receiptsData = await getAllReceipts();
-      // ✅ filter confirmed only
-      const confirmedReceipts = receiptsData.filter(r => r.order.status === 'confirmed');
+      let receiptsData = [];
+      if (currentUser.role === 'customer') {
+        receiptsData = await getCustomerReceipts();
+      } else if (currentUser.role === 'farmer') {
+        receiptsData = await getFarmerReceipts();
+      }
+      // normalize confirmed filter
+      const confirmedReceipts = receiptsData.filter(r => r.order?.status?.toLowerCase() === 'confirmed');
       setReceipts(confirmedReceipts);
     } catch (err) {
       setError('Failed to fetch receipts.');
