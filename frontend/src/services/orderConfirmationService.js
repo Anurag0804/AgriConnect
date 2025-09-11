@@ -42,3 +42,13 @@ export const getCustomerOrderConfirmations = async () => {
   const res = await axios.get(API_URL + 'customer', { headers });
   return res.data;
 };
+
+// Get all order confirmations
+export const getAllOrderConfirmations = async () => {
+  const headers = getAuthHeader();
+  if (!headers.Authorization) {
+    throw new Error('No authorization token found. Please log in.');
+  }
+  const res = await axios.get(API_URL, { headers });
+  return res.data;
+};

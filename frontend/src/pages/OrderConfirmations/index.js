@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getFarmerOrderConfirmations, getCustomerOrderConfirmations } from '../../services/orderConfirmationService';
+import { getAllOrderConfirmations } from '../../services/orderConfirmationService';
 import { getCurrentUser } from '../../services/authService';
 
 export default function OrderConfirmations() {
@@ -12,14 +12,8 @@ export default function OrderConfirmations() {
     const fetchOrderConfirmations = async () => {
       try {
         setLoading(true);
-        let orderConfirmationsData;
-        if (currentUser.role === 'farmer') {
-          orderConfirmationsData = await getFarmerOrderConfirmations();
-        } else {
-          orderConfirmationsData = await getCustomerOrderConfirmations();
-        }
-        const confirmedOrderConfirmations = orderConfirmationsData.filter(oc => oc.status === 'confirmed');
-        setOrderConfirmations(confirmedOrderConfirmations);
+        const orderConfirmationsData = await getAllOrderConfirmations();
+        setOrderConfirmations(orderConfirmationsData);
       } catch (err) {
         setError('Failed to fetch order confirmations.');
         console.error(err);
@@ -59,7 +53,7 @@ export default function OrderConfirmations() {
                 <td className="py-2 px-4">{oc.order.crop.name}</td>
                 <td className="py-2 px-4">{oc.order.quantity}</td>
                 <td className="py-2 px-4">₹{oc.order.totalPrice}</td>
-                <td className="py-2 px-4">{currentUser.role === 'farmer' ? oc.customer.name : oc.farmer.name}</td>
+                <td className="py-2 px-4">{currentUser.role === 'farmer' ? oc.order.user.name : oc.order.farmer.name}</td>
                 <td className="py-2 px-4">{oc.status}</td>
               </tr>
             ))}

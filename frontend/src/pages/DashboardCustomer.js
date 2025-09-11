@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { getCrops } from '../services/cropService';
 import { createOrder } from '../services/orderService';
 import GlobalContext from '../context/GlobalState';
-import { ShoppingCart } from 'lucide-react';
+import { History, ShoppingCart } from 'lucide-react';
 import { buyCrop } from '../services/transactionService';
 import { Search, X } from 'lucide-react';
 
@@ -103,6 +103,7 @@ export default function DashboardCustomer() {
             My Cart
           </Link>
           <Link to="/history/customer" className="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition">
+            <History className="inline-block mr-2" />
             Purchase History
           </Link>
         </div>
