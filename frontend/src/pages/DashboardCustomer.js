@@ -98,7 +98,7 @@ export default function DashboardCustomer() {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-primary">Marketplace</h1>
         <div>
-          <Link to="/inventory/customer" className="bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700 transition mr-2">
+          <Link to="/my-cart" className="bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700 transition mr-2">
             <ShoppingCart className="inline-block mr-2" />
             My Cart
           </Link>

@@ -15,6 +15,7 @@ import Profile from "./pages/Profile"; // Import new page
 import Orders from "./pages/Orders";
 import OrderConfirmations from "./pages/OrderConfirmations";
 import Receipts from "./pages/Receipts";
+import MyCart from "./pages/MyCart";
 
 function App() {
   return (
@@ -57,6 +58,14 @@ function App() {
               element={
                 <ProtectedRoute roles={["customer"]}>
                   <CustomerInventory />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/my-cart"
+              element={
+                <ProtectedRoute roles={["customer"]}>
+                  <MyCart />
                 </ProtectedRoute>
               }
             />
