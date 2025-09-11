@@ -14,12 +14,22 @@ const getAuthHeader = () => {
 };
 
 // Create a new receipt
-export const createReceipt = async (orderConfirmationId) => {
+export const createReceipt = async (orderId) => {
   const headers = getAuthHeader();
   if (!headers.Authorization) {
     throw new Error('No authorization token found. Please log in.');
   }
-  const res = await axios.post(API_URL, { orderConfirmation: orderConfirmationId }, { headers });
+  const res = await axios.post(API_URL, { order: orderId }, { headers });
+  return res.data;
+};
+
+// Get all receipts
+export const getAllReceipts = async () => {
+  const headers = getAuthHeader();
+  if (!headers.Authorization) {
+    throw new Error('No authorization token found. Please log in.');
+  }
+  const res = await axios.get(API_URL, { headers });
   return res.data;
 };
 

@@ -13,7 +13,6 @@ import CustomerInventory from "./pages/CustomerInventory";
 import FarmerHistory from "./pages/FarmerHistory";
 import Profile from "./pages/Profile"; // Import new page
 import Orders from "./pages/Orders";
-import OrderConfirmations from "./pages/OrderConfirmations";
 import Receipts from "./pages/Receipts";
 import MyCart from "./pages/MyCart";
 
@@ -104,14 +103,6 @@ function App() {
               element={
                 <ProtectedRoute roles={["customer", "farmer"]}>
                   <Orders />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/order-confirmations"
-              element={
-                <ProtectedRoute roles={["customer", "farmer"]}>
-                  <OrderConfirmations />
                 </ProtectedRoute>
               }
             />

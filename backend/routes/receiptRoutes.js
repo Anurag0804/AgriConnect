@@ -8,9 +8,9 @@ const { protect, authorize } = require('../middleware/authMiddleware');
 // @access  Private (Farmer)
 router.post('/', protect, authorize('farmer'), async (req, res) => {
   try {
-    const { orderConfirmation } = req.body;
+    const { order } = req.body;
     const receipt = new Receipt({
-      orderConfirmation,
+      order,
     });
     const createdReceipt = await receipt.save();
     res.status(201).json(createdReceipt);
@@ -25,13 +25,15 @@ router.post('/', protect, authorize('farmer'), async (req, res) => {
 router.get('/farmer', protect, authorize('farmer'), async (req, res) => {
   try {
     const receipts = await Receipt.find().populate({
-      path: 'orderConfirmation',
-      populate: {
-        path: 'order',
-        match: { farmer: req.user.id }
-      }
+      path: 'order',
+      match: { farmer: req.user.id },
+      populate: [
+        { path: 'user', select: 'name' },
+        { path: 'farmer', select: 'name' },
+        { path: 'crop', select: 'name' }
+      ]
     });
-    res.json(receipts.filter(r => r.orderConfirmation && r.orderConfirmation.order));
+    res.json(receipts.filter(r => r.order));
   } catch (error) {
     res.status(500).json({ error: 'Server Error' });
   }
@@ -43,13 +45,39 @@ router.get('/farmer', protect, authorize('farmer'), async (req, res) => {
 router.get('/customer', protect, authorize('customer'), async (req, res) => {
   try {
     const receipts = await Receipt.find().populate({
-      path: 'orderConfirmation',
-      populate: {
-        path: 'order',
-        match: { customer: req.user.id }
-      }
+      path: 'order',
+      match: { customer: req.user.id },
+      populate: [
+        { path: 'user', select: 'name' },
+        { path: 'farmer', select: 'name' },
+        { path: 'crop', select: 'name' }
+      ]
     });
-    res.json(receipts.filter(r => r.orderConfirmation && r.orderConfirmation.order));
+    res.json(receipts.filter(r => r.order));
+  } catch (error) {
+    res.status(500).json({ error: 'Server Error' });
+  }
+});
+
+// @desc    Get all receipts for confirmed orders
+// @route   GET /api/receipts
+// @access  Private
+router.get('/', protect, async (req, res) => {
+  try {
+    const receipts = await Receipt.find({})
+      .populate({
+        path: 'order',
+        match: { status: 'Confirmed' },
+        populate: [
+          { path: 'user', select: 'name' },
+          { path: 'farmer', select: 'name' },
+          { path: 'crop', select: 'name' }
+        ]
+      });
+
+    const filteredReceipts = receipts.filter(r => r.order !== null);
+
+    res.json(filteredReceipts);
   } catch (error) {
     res.status(500).json({ error: 'Server Error' });
   }
