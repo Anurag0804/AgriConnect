@@ -5,6 +5,7 @@ import { getFarmerOrders, updateOrderStatus } from '../services/orderService';
 import { getFarmerTransactions } from '../services/transactionService';
 import { getCurrentUser } from '../services/authService';
 import { ArrowUpFromLine, History } from 'lucide-react';
+import { createReceipt } from '../services/receiptService';
 
 export default function DashboardFarmer() {
   const [crops, setCrops] = useState([]);
@@ -69,16 +70,25 @@ export default function DashboardFarmer() {
   };
 
   const handleAcceptOrder = async (orderId) => {
-    try {
-      await updateOrderStatus(orderId, 'confirmed');
-      fetchData();
-    } catch (err) {
-      setError(err.response?.data?.error || 'Failed to accept order.');
-      console.error(err);
-    }
-  };
+  try {
+    await updateOrderStatus(orderId, 'confirmed');
+    await createReceipt(orderId); // ✅ create receipt automatically
+    fetchData();
+  } catch (err) {
+    setError(err.response?.data?.error || 'Failed to accept order.');
+    console.error(err);
+  }
+};
 
   const totalIncome = history.reduce((acc, tx) => acc + tx.totalPrice, 0);
+  // Total sales count = number of transactions
+  const totalSales = history.length;
+
+// Last sale = latest transaction (sorted by createdAt)
+   const lastSale = history.length > 0
+  ? new Date(Math.max(...history.map(tx => new Date(tx.createdAt)))).toLocaleString()
+  : 'No sales yet';
+
 
   const pendingOrders = orders.filter((order) => order.status === 'pending');
   const confirmedOrders = orders.filter((order) => order.status === 'confirmed');
@@ -106,9 +116,11 @@ export default function DashboardFarmer() {
         </div>
         <div className="bg-white p-6 rounded-lg shadow-md text-center">
           <h3 className="text-lg font-semibold text-gray-600">Total Sales</h3>
+          <p className="text-3xl font-bold text-green-600">{totalSales}</p>
         </div>
         <div className="bg-white p-6 rounded-lg shadow-md text-center">
           <h3 className="text-lg font-semibold text-gray-600">Last Sale</h3>
+          <p className="text-3xl font-bold text-red-600">{lastSale}</p>
         </div>
       </div>
 
