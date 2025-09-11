@@ -27,18 +27,10 @@ export default function Receipts() {
   };
 
   useEffect(() => {
-    fetchReceipts();
-  }, []);
-
-  const handleUpdateStatus = async (receiptId, status) => {
-    try {
-      await updateReceiptStatus(receiptId, status);
+    if (currentUser) {
       fetchReceipts();
-    } catch (err) {
-      setError('Failed to update receipt status.');
-      console.error(err);
     }
-  };
+  }, [currentUser?.userId]);
 
   return (
     <div className="container mx-auto">
@@ -52,27 +44,22 @@ export default function Receipts() {
           <thead>
             <tr className="border-b-2 border-gray-200">
               <th className="py-2 px-4">Order ID</th>
+              <th className="py-2 px-4">Crop</th>
+              <th className="py-2 px-4">Quantity (kg)</th>
+              <th className="py-2 px-4">Total Price</th>
+              <th className="py-2 px-4">{currentUser.role === 'farmer' ? 'Customer' : 'Farmer'}</th>
               <th className="py-2 px-4">Payment Status</th>
-              {currentUser.role === 'customer' && <th className="py-2 px-4">Actions</th>}
             </tr>
           </thead>
           <tbody>
             {receipts.map((receipt) => (
               <tr key={receipt._id} className="border-b border-gray-100">
-                <td className="py-2 px-4 font-semibold">{receipt.orderConfirmation.order._id}</td>
+                <td className="py-2 px-4 font-semibold">{receipt.order._id}</td>
+                <td className="py-2 px-4">{receipt.crop.name}</td>
+                <td className="py-2 px-4">{receipt.quantity}</td>
+                <td className="py-2 px-4">₹{receipt.totalPrice}</td>
+                <td className="py-2 px-4">{currentUser.role === 'farmer' ? receipt.customer.name : receipt.farmer.name}</td>
                 <td className="py-2 px-4">{receipt.paymentStatus}</td>
-                {currentUser.role === 'customer' && (
-                  <td className="py-2 px-4">
-                    {receipt.paymentStatus === 'unpaid' && (
-                      <button
-                        onClick={() => handleUpdateStatus(receipt._id, 'paid')}
-                        className="bg-green-600 text-white font-bold py-1 px-2 rounded-lg hover:bg-green-700 transition"
-                      >
-                        Mark as Paid
-                      </button>
-                    )}
-                  </td>
-                )}
               </tr>
             ))}
           </tbody>

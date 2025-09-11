@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { getFarmerOrderConfirmations, getCustomerOrderConfirmations } from '../../services/orderConfirmationService';
-import { createReceipt } from '../../services/receiptService';
 import { getCurrentUser } from '../../services/authService';
 
 export default function OrderConfirmations() {
@@ -9,37 +8,30 @@ export default function OrderConfirmations() {
   const [error, setError] = useState('');
   const currentUser = getCurrentUser();
 
-  const fetchOrderConfirmations = async () => {
-    try {
-      setLoading(true);
-      let orderConfirmationsData;
-      if (currentUser.role === 'farmer') {
-        orderConfirmationsData = await getFarmerOrderConfirmations();
-      } else {
-        orderConfirmationsData = await getCustomerOrderConfirmations();
-      }
-      setOrderConfirmations(orderConfirmationsData);
-    } catch (err) {
-      setError('Failed to fetch order confirmations.');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchOrderConfirmations();
-  }, []);
+    const fetchOrderConfirmations = async () => {
+      try {
+        setLoading(true);
+        let orderConfirmationsData;
+        if (currentUser.role === 'farmer') {
+          orderConfirmationsData = await getFarmerOrderConfirmations();
+        } else {
+          orderConfirmationsData = await getCustomerOrderConfirmations();
+        }
+        const confirmedOrderConfirmations = orderConfirmationsData.filter(oc => oc.status === 'confirmed');
+        setOrderConfirmations(confirmedOrderConfirmations);
+      } catch (err) {
+        setError('Failed to fetch order confirmations.');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const handleCreateReceipt = async (orderConfirmationId) => {
-    try {
-      await createReceipt(orderConfirmationId);
+    if (currentUser) {
       fetchOrderConfirmations();
-    } catch (err) {
-      setError('Failed to create receipt.');
-      console.error(err);
     }
-  };
+  }, [currentUser?.userId]);
 
   return (
     <div className="container mx-auto">
@@ -53,27 +45,22 @@ export default function OrderConfirmations() {
           <thead>
             <tr className="border-b-2 border-gray-200">
               <th className="py-2 px-4">Order ID</th>
+              <th className="py-2 px-4">Crop</th>
+              <th className="py-2 px-4">Quantity (kg)</th>
+              <th className="py-2 px-4">Total Price</th>
+              <th className="py-2 px-4">{currentUser.role === 'farmer' ? 'Customer' : 'Farmer'}</th>
               <th className="py-2 px-4">Status</th>
-              {currentUser.role === 'farmer' && <th className="py-2 px-4">Actions</th>}
             </tr>
           </thead>
           <tbody>
             {orderConfirmations.map((oc) => (
               <tr key={oc._id} className="border-b border-gray-100">
                 <td className="py-2 px-4 font-semibold">{oc.order._id}</td>
+                <td className="py-2 px-4">{oc.order.crop.name}</td>
+                <td className="py-2 px-4">{oc.order.quantity}</td>
+                <td className="py-2 px-4">₹{oc.order.totalPrice}</td>
+                <td className="py-2 px-4">{currentUser.role === 'farmer' ? oc.customer.name : oc.farmer.name}</td>
                 <td className="py-2 px-4">{oc.status}</td>
-                {currentUser.role === 'farmer' && (
-                  <td className="py-2 px-4">
-                    {oc.status === 'confirmed' && (
-                      <button
-                        onClick={() => handleCreateReceipt(oc._id)}
-                        className="bg-blue-600 text-white font-bold py-1 px-2 rounded-lg hover:bg-blue-700 transition"
-                      >
-                        Create Receipt
-                      </button>
-                    )}
-                  </td>
-                )}
               </tr>
             ))}
           </tbody>
