@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { createCrop, getFarmerCrops } from '../services/cropService';
+import { getFarmerOrders, updateOrderStatus } from '../services/orderService';
 import { getFarmerTransactions } from '../services/transactionService';
 import { getCurrentUser } from '../services/authService';
 import { ArrowUpFromLine } from 'lucide-react';
 
 export default function DashboardFarmer() {
   const [crops, setCrops] = useState([]);
+  const [orders, setOrders] = useState([]);
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -25,11 +27,13 @@ export default function DashboardFarmer() {
     if (!currentUser) return;
     try {
       setLoading(true);
-      const [cropsData, historyData] = await Promise.all([
+      const [cropsData, ordersData, historyData] = await Promise.all([
         getFarmerCrops(currentUser.userId),
+        getFarmerOrders(),
         getFarmerTransactions()
       ]);
       setCrops(cropsData);
+      setOrders(ordersData);
       setHistory(historyData);
     } catch (err) {
       setError('Failed to fetch dashboard data.');
@@ -62,8 +66,21 @@ export default function DashboardFarmer() {
     }
   };
 
+  const handleAcceptOrder = async (orderId) => {
+    try {
+      await updateOrderStatus(orderId, 'confirmed');
+      fetchData();
+    } catch (err) {
+      setError(err.response?.data?.error || 'Failed to accept order.');
+      console.error(err);
+    }
+  };
+
   const totalIncome = history.reduce((acc, tx) => acc + tx.totalPrice, 0);
   const lastSaleDate = history.length > 0 ? new Date(history[0].date).toLocaleDateString() : 'N/A';
+
+  const pendingOrders = orders.filter(order => order.status === 'pending');
+  const confirmedOrders = orders.filter(order => order.status === 'confirmed');
 
   return (
     <div className="container mx-auto">
@@ -88,6 +105,81 @@ export default function DashboardFarmer() {
           <h3 className="text-lg font-semibold text-gray-600">Last Sale Date</h3>
           <p className="text-3xl font-bold text-green-600">{lastSaleDate}</p>
         </div>
+      </div>
+
+      {/* Incoming Orders Section */}
+      <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 mb-8">
+        <h2 className="text-2xl font-bold text-primary mb-4">Incoming Orders</h2>
+        {loading ? (
+          <p>Loading orders...</p>
+        ) : pendingOrders.length > 0 ? (
+          <table className="w-full text-left">
+            <thead>
+              <tr className="border-b-2 border-gray-200">
+                <th className="py-2 px-4">CROP</th>
+                <th className="py-2 px-4">QUANTITY (kg)</th>
+                <th className="py-2 px-4">CUSTOMER</th>
+                <th className="py-2 px-4">TOTAL PRICE</th>
+                <th className="py-2 px-4">STATUS</th>
+                <th className="py-2 px-4">ACTION</th>
+              </tr>
+            </thead>
+            <tbody>
+              {pendingOrders.map((order) => (
+                <tr key={order._id} className="border-b border-gray-100">
+                  <td className="py-2 px-4 font-semibold">{order.crop.name}</td>
+                  <td className="py-2 px-4">{order.quantity}</td>
+                  <td className="py-2 px-4">{order.customer.name}</td>
+                  <td className="py-2 px-4">₹{order.totalPrice}</td>
+                  <td className="py-2 px-4">{order.status}</td>
+                  <td className="py-2 px-4">
+                    <button
+                      onClick={() => handleAcceptOrder(order._id)}
+                      className="bg-green-600 text-white font-bold py-1 px-3 rounded-lg hover:bg-green-700 transition"
+                    >
+                      Accept
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <p>No incoming orders.</p>
+        )}
+      </div>
+
+      {/* Confirmed Orders Section */}
+      <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 mb-8">
+        <h2 className="text-2xl font-bold text-primary mb-4">Confirmed Orders</h2>
+        {loading ? (
+          <p>Loading orders...</p>
+        ) : confirmedOrders.length > 0 ? (
+          <table className="w-full text-left">
+            <thead>
+              <tr className="border-b-2 border-gray-200">
+                <th className="py-2 px-4">CROP</th>
+                <th className="py-2 px-4">QUANTITY (kg)</th>
+                <th className="py-2 px-4">CUSTOMER</th>
+                <th className="py-2 px-4">TOTAL PRICE</th>
+                <th className="py-2 px-4">STATUS</th>
+              </tr>
+            </thead>
+            <tbody>
+              {confirmedOrders.map((order) => (
+                <tr key={order._id} className="border-b border-gray-100">
+                  <td className="py-2 px-4 font-semibold">{order.crop.name}</td>
+                  <td className="py-2 px-4">{order.quantity}</td>
+                  <td className="py-2 px-4">{order.customer.name}</td>
+                  <td className="py-2 px-4">₹{order.totalPrice}</td>
+                  <td className="py-2 px-4">{order.status}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <p>No confirmed orders.</p>
+        )}
       </div>
 
       <div className="grid md:grid-cols-2 gap-8">
