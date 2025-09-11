@@ -71,7 +71,7 @@ export default function Navbar() {
                 </button>
                 <div className="absolute hidden group-hover:block bg-white text-black p-2 rounded-md shadow-lg">
                   <Link to="/orders" className="block hover:text-secondary">Orders</Link>
-                  <Link to="/order-confirmations" className="block hover:text-secondary">Order Confirmations</Link>
+                  
                   <Link to="/receipts" className="block hover:text-secondary">Receipts</Link>
                 </div>
               </div>
