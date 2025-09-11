@@ -4,7 +4,7 @@ import { createCrop, getFarmerCrops } from '../services/cropService';
 import { getFarmerOrders, updateOrderStatus } from '../services/orderService';
 import { getFarmerTransactions } from '../services/transactionService';
 import { getCurrentUser } from '../services/authService';
-import { ArrowUpFromLine } from 'lucide-react';
+import { ArrowUpFromLine, History } from 'lucide-react';
 
 export default function DashboardFarmer() {
   const [crops, setCrops] = useState([]);
@@ -87,6 +87,7 @@ export default function DashboardFarmer() {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-primary">Farmer Dashboard</h1>
         <Link to="/history/farmer" className="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition">
+        <History className="inline-block mr-2" />
           View Full Sales History
         </Link>
       </div>

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { getCurrentUser, logout } from "../services/authService";
-import { LayoutDashboard, User, ShoppingCart, LogOut } from "lucide-react";
+import { LayoutDashboard, User, LogOut, Notebook } from "lucide-react";
 
 export default function Navbar() {
   const [user, setUser] = useState(getCurrentUser());
@@ -66,7 +66,7 @@ export default function Navbar() {
               </Link>
               <div className="relative group">
                 <button className="hover:text-gray-300">
-                  <ShoppingCart className="inline-block mr-2" />
+                  <Notebook className="inline-block mr-2" />
                   Orders
                 </button>
                 <div className="absolute hidden group-hover:block bg-white text-black p-2 rounded-md shadow-lg">
