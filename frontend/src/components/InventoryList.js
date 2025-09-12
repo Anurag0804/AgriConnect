@@ -39,7 +39,7 @@ export default function InventoryList({ searchTerm }) {
           <tr>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Crop</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity (Kg)</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Weight (Kg)</th>
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
@@ -47,7 +47,7 @@ export default function InventoryList({ searchTerm }) {
             <tr key={inventory._id}>
               <td className="px-6 py-4 whitespace-nowrap">{inventory.customer?.username}</td>
               <td className="px-6 py-4 whitespace-nowrap">{inventory.cropName}</td>
-              <td className="px-6 py-4 whitespace-nowrap">{inventory.quantity}</td>
+              <td className="px-6 py-4 whitespace-nowrap">{inventory.weight}</td>
             </tr>
           ))}
         </tbody>

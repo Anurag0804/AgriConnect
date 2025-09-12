@@ -20,7 +20,14 @@ router.get('/customer', protect, authorize('customer'), async (req, res) => {
 // @access  Private (Admin)
 router.get('/all', protect, authorize('admin'), async (req, res) => {
   try {
-    const inventories = await Inventory.find({}).populate('customer', 'username');
+    const { search } = req.query;
+    let query = {};
+
+    if (search) {
+      query.cropName = { $regex: search, $options: 'i' }; // Case-insensitive search on cropName
+    }
+
+    const inventories = await Inventory.find(query).populate('customer', 'username');
     res.json(inventories);
   } catch (error) {
     res.status(500).json({ error: 'Server Error' });

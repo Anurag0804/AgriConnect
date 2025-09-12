@@ -92,10 +92,9 @@ router.put('/:id', protect, async (req, res) => {
 // @access  Private/Admin
 router.delete('/:id', protect, authorize('admin'), async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
+    const user = await User.findByIdAndDelete(req.params.id);
 
     if (user) {
-      await user.remove();
       res.json({ message: 'User removed' });
     } else {
       res.status(404).json({ error: 'User not found' });
