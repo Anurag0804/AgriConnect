@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { getCustomerReceipts, getFarmerReceipts, updateReceiptStatus } from '../../services/receiptService';
 import { getCurrentUser } from '../../services/authService';
 
@@ -6,20 +6,22 @@ export default function Receipts() {
   const [receipts, setReceipts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const currentUser = getCurrentUser();
 
+  // Memoize currentUser to keep stable reference across renders
+  const currentUser = useMemo(() => getCurrentUser(), []);
+
+  // fetchReceipts only depends on stable primitive fields
   const fetchReceipts = useCallback(async () => {
+    if (!currentUser) return;
+
     try {
       setLoading(true);
       let receiptsData = [];
-      console.log("🔍 Current user:", currentUser); // 👈 add this
-      console.log("🔍 Role:", currentUser?.role);
       if (currentUser.role === 'customer') {
         receiptsData = await getCustomerReceipts();
       } else if (currentUser.role === 'farmer') {
         receiptsData = await getFarmerReceipts();
       }
-      console.log("✅ API response:", receiptsData);
       const confirmedReceipts = receiptsData.filter(r => r.order?.status === 'confirmed');
       setReceipts(confirmedReceipts);
     } catch (err) {
@@ -28,13 +30,13 @@ export default function Receipts() {
     } finally {
       setLoading(false);
     }
-  }, [currentUser?.id, currentUser?.role]);;
+  }, [currentUser?.id, currentUser?.role]);
 
+  // useEffect triggers fetchReceipts only when currentUser changes (which won't cause infinite loops due to memoization)
   useEffect(() => {
-    if (currentUser) {
-      fetchReceipts();
-    }
-  }, [currentUser, fetchReceipts]);
+    fetchReceipts();
+  }, [fetchReceipts]);
+
 
   const handlePaymentStatusUpdate = async (receiptId, newStatus) => {
     try {
@@ -65,9 +67,12 @@ export default function Receipts() {
               <p className="text-gray-600 mb-1"><strong>Quantity:</strong> {receipt.order.quantity} kg</p>
               <p className="text-gray-600 mb-1"><strong>Total Price:</strong> ₹{receipt.order.totalPrice}</p>
               <p className="text-gray-600 mb-1">
-                <strong>{currentUser.role === 'farmer' ? 'Customer' : 'Farmer'}:</strong>{' '}
-                {currentUser.role === 'farmer' ? receipt.order.user.name : receipt.order.farmer.name}
-              </p>
+  <strong>{currentUser.role === 'farmer' ? 'Customer' : 'Farmer'}:</strong>{' '}
+  {currentUser.role === 'farmer'
+    ? receipt.order.customer?.name || receipt.order.customer?.username || 'Unknown Customer'
+    : receipt.order.farmer?.name || receipt.order.farmer?.username || 'Unknown Farmer'}
+</p>
+
               <p className="text-gray-600 mb-4">
                 <strong>Payment Status:</strong>{' '}
                 <span className={`font-bold ${receipt.paymentStatus === 'paid' ? 'text-green-600' : 'text-red-600'}`}>
