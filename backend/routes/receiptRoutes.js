@@ -15,7 +15,7 @@ router.post('/', protect, authorize('farmer'), async (req, res) => {
 
     const receipt = new Receipt({
       order,
-      customer: orderDoc.user,   // ✅ user = customer
+      customer: orderDoc.customer,   // ✅ user = customer
       farmer: orderDoc.farmer,
       paymentStatus: 'unpaid'
     });
@@ -31,10 +31,12 @@ router.post('/', protect, authorize('farmer'), async (req, res) => {
 // @route   GET /api/receipts/farmer
 // @access  Private (Farmer)
 router.get('/farmer', protect, authorize('farmer'), async (req, res) => {
+  console.log("👨‍🌾 Farmer receipts request from user:", req.user);
   try {
     const receipts = await Receipt.find({ farmer: req.user.id })
       .populate({
         path: 'order',
+        select: 'status totalPrice quantity',
         populate: [
           { path: 'user', select: 'name' },
           { path: 'farmer', select: 'name' },
@@ -51,16 +53,19 @@ router.get('/farmer', protect, authorize('farmer'), async (req, res) => {
 // @route   GET /api/receipts/customer
 // @access  Private (Customer)
 router.get('/customer', protect, authorize('customer'), async (req, res) => {
+  console.log("🛒 Customer receipts request from user:", req.user);
   try {
     const receipts = await Receipt.find({ customer: req.user.id })
       .populate({
         path: 'order',
+        select: 'status totalPrice quantity',
         populate: [
           { path: 'user', select: 'name' },
           { path: 'farmer', select: 'name' },
           { path: 'crop', select: 'name' }
         ]
       });
+      console.log("✅ Found receipts:", receipts);
     res.json(receipts);
   } catch (error) {
     res.status(500).json({ error: 'Server Error' });
