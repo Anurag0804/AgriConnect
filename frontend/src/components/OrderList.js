@@ -1,23 +1,19 @@
 import { useState, useEffect } from 'react';
 import { getAllOrders } from '../services/orderService';
-import { useLocation } from 'react-router-dom';
 
-export default function OrderList() {
+export default function OrderList({ searchTerm }) {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const location = useLocation();
-
-  const searchQuery = new URLSearchParams(location.search).get('search') || '';
 
   useEffect(() => {
     fetchOrders();
-  }, [searchQuery]);
+  }, [searchTerm]);
 
   const fetchOrders = async () => {
     try {
       setLoading(true);
-      const data = await getAllOrders(searchQuery);
+      const data = await getAllOrders(searchTerm);
       setOrders(data);
     } catch (err) {
       setError('Failed to fetch orders.');

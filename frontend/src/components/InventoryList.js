@@ -1,23 +1,19 @@
 import { useState, useEffect } from 'react';
 import { getAllInventories } from '../services/inventoryService';
-import { useLocation } from 'react-router-dom';
 
-export default function InventoryList() {
+export default function InventoryList({ searchTerm }) {
   const [inventories, setInventories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const location = useLocation();
-
-  const searchQuery = new URLSearchParams(location.search).get('search') || '';
 
   useEffect(() => {
     fetchInventories();
-  }, [searchQuery]);
+  }, [searchTerm]);
 
   const fetchInventories = async () => {
     try {
       setLoading(true);
-      const data = await getAllInventories(searchQuery);
+      const data = await getAllInventories(searchTerm);
       setInventories(data);
     } catch (err) {
       setError('Failed to fetch inventories.');

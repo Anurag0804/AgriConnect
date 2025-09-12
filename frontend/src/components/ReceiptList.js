@@ -1,23 +1,19 @@
 import { useState, useEffect } from 'react';
 import { getAllReceipts } from '../services/receiptService';
-import { useLocation } from 'react-router-dom';
 
-export default function ReceiptList() {
+export default function ReceiptList({ searchTerm }) {
   const [receipts, setReceipts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const location = useLocation();
-
-  const searchQuery = new URLSearchParams(location.search).get('search') || '';
 
   useEffect(() => {
     fetchReceipts();
-  }, [searchQuery]);
+  }, [searchTerm]);
 
   const fetchReceipts = async () => {
     try {
       setLoading(true);
-      const data = await getAllReceipts(searchQuery);
+      const data = await getAllReceipts(searchTerm);
       setReceipts(data);
     } catch (err) {
       setError('Failed to fetch receipts.');

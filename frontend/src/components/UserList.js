@@ -1,25 +1,21 @@
 import { useState, useEffect } from 'react';
 import { getAllUsers, deleteUser, updateUser } from '../services/userService';
 import EditUserModal from './EditUserModal';
-import { useLocation } from 'react-router-dom';
 
-export default function UserList() {
+export default function UserList({ searchTerm }) {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [editingUser, setEditingUser] = useState(null);
-  const location = useLocation();
-
-  const searchQuery = new URLSearchParams(location.search).get('search') || '';
 
   useEffect(() => {
     fetchUsers();
-  }, [searchQuery]);
+  }, [searchTerm]);
 
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const data = await getAllUsers(searchQuery);
+      const data = await getAllUsers(searchTerm);
       setUsers(data);
     } catch (err) {
       setError('Failed to fetch users. You might not have the required permissions.');

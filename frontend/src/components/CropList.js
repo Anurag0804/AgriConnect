@@ -1,25 +1,21 @@
 import { useState, useEffect } from 'react';
 import { getAllCrops, createCrop, updateCrop, deleteCrop } from '../services/cropService';
-import { useLocation } from 'react-router-dom';
 
-export default function CropList() {
+export default function CropList({ searchTerm }) {
   const [crops, setCrops] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [editingCrop, setEditingCrop] = useState(null);
   const [isCreating, setIsCreating] = useState(false);
-  const location = useLocation();
-
-  const searchQuery = new URLSearchParams(location.search).get('search') || '';
 
   useEffect(() => {
     fetchCrops();
-  }, [searchQuery]);
+  }, [searchTerm]);
 
   const fetchCrops = async () => {
     try {
       setLoading(true);
-      const data = await getAllCrops(searchQuery);
+      const data = await getAllCrops(searchTerm);
       setCrops(data);
     } catch (err) {
       setError('Failed to fetch crops.');

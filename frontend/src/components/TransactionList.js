@@ -1,23 +1,19 @@
 import { useState, useEffect } from 'react';
 import { getAllTransactions } from '../services/transactionService';
-import { useLocation } from 'react-router-dom';
 
-export default function TransactionList() {
+export default function TransactionList({ searchTerm }) {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const location = useLocation();
-
-  const searchQuery = new URLSearchParams(location.search).get('search') || '';
 
   useEffect(() => {
     fetchTransactions();
-  }, [searchQuery]);
+  }, [searchTerm]);
 
   const fetchTransactions = async () => {
     try {
       setLoading(true);
-      const data = await getAllTransactions(searchQuery);
+      const data = await getAllTransactions(searchTerm);
       setTransactions(data);
     } catch (err) {
       setError('Failed to fetch transactions.');
