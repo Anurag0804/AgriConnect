@@ -32,3 +32,26 @@ export const updateUser = async (userId, userData) => {
   const res = await axios.put(API_URL + userId, userData, { headers });
   return res.data;
 };
+
+
+// Get all users (admin only)
+export const getAllUsers = async (searchQuery = '') => {
+  const headers = getAuthHeader();
+  if (!headers.Authorization) {
+    throw new Error('No authorization token found. Please log in.');
+  }
+  const res = await axios.get(API_URL + `?search=${searchQuery}`, { headers });
+  return res.data;
+};
+
+// Delete a user (admin only)
+export const deleteUser = async (userId) => {
+  const headers = getAuthHeader();
+  if (!headers.Authorization) {
+    throw new Error('No authorization token found. Please log in.');
+  }
+  const res = await axios.delete(API_URL + userId, { headers });
+  return res.data;
+};
+
+

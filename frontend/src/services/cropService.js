@@ -38,3 +38,33 @@ export const getFarmerCrops = async (farmerId) => {
   const res = await axios.get(API_URL + `farmer/${farmerId}`, { headers });
   return res.data;
 };
+
+// Get all crops (admin only)
+export const getAllCrops = async (searchQuery = '') => {
+  const headers = getAuthHeader();
+  if (!headers.Authorization) {
+    throw new Error('No authorization token found. Please log in.');
+  }
+  const res = await axios.get(API_URL + `all?search=${searchQuery}`, { headers });
+  return res.data;
+};
+
+// Update a crop (admin only)
+export const updateCrop = async (cropId, cropData) => {
+  const headers = getAuthHeader();
+  if (!headers.Authorization) {
+    throw new Error('No authorization token found. Please log in.');
+  }
+  const res = await axios.put(API_URL + cropId, cropData, { headers });
+  return res.data;
+};
+
+// Delete a crop (admin only)
+export const deleteCrop = async (cropId) => {
+  const headers = getAuthHeader();
+  if (!headers.Authorization) {
+    throw new Error('No authorization token found. Please log in.');
+  }
+  const res = await axios.delete(API_URL + cropId, { headers });
+  return res.data;
+};

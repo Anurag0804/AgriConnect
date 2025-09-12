@@ -15,4 +15,16 @@ router.get('/customer', protect, authorize('customer'), async (req, res) => {
   }
 });
 
+// @desc    Get all inventories (Admin)
+// @route   GET /api/inventory/all
+// @access  Private (Admin)
+router.get('/all', protect, authorize('admin'), async (req, res) => {
+  try {
+    const inventories = await Inventory.find({}).populate('customer', 'username');
+    res.json(inventories);
+  } catch (error) {
+    res.status(500).json({ error: 'Server Error' });
+  }
+});
+
 module.exports = router;

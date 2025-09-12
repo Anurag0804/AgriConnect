@@ -11,10 +11,16 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import PurchaseHistory from "./pages/PurchaseHistory";
 import CustomerInventory from "./pages/CustomerInventory";
 import FarmerHistory from "./pages/FarmerHistory";
-import Profile from "./pages/Profile"; // Import new page
+import Profile from "./pages/Profile";
 import Orders from "./pages/Orders";
 import Receipts from "./pages/Receipts";
 import MyCart from "./pages/MyCart";
+import AdminUserManagement from "./pages/AdminUserManagement";
+import AdminCropManagement from "./pages/AdminCropManagement";
+import AdminInventoryManagement from "./pages/AdminInventoryManagement";
+import AdminTransactionHistory from "./pages/AdminTransactionHistory";
+import AdminOrderManagement from "./pages/AdminOrderManagement";
+import AdminReceiptManagement from "./pages/AdminReceiptManagement";
 
 function App() {
   return (
@@ -27,7 +33,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route
-              path="/profile" // Add new route
+              path="/profile"
               element={
                 <ProtectedRoute roles={["customer", "farmer", "admin"]}>
                   <Profile />
@@ -93,6 +99,54 @@ function App() {
               element={
                 <ProtectedRoute roles={["admin"]}>
                   <DashboardAdmin />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/users"
+              element={
+                <ProtectedRoute roles={["admin"]}>
+                  <AdminUserManagement />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/crops"
+              element={
+                <ProtectedRoute roles={["admin"]}>
+                  <AdminCropManagement />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/inventory"
+              element={
+                <ProtectedRoute roles={["admin"]}>
+                  <AdminInventoryManagement />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/transactions"
+              element={
+                <ProtectedRoute roles={["admin"]}>
+                  <AdminTransactionHistory />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/orders"
+              element={
+                <ProtectedRoute roles={["admin"]}>
+                  <AdminOrderManagement />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/receipts"
+              element={
+                <ProtectedRoute roles={["admin"]}>
+                  <AdminReceiptManagement />
                 </ProtectedRoute>
               }
             />

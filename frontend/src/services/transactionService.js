@@ -8,9 +8,8 @@ const getAuthHeader = () => {
   const user = getCurrentUser();
   if (user && user.token) {
     return { Authorization: 'Bearer ' + user.token };
-  } else {
-    return {};
   }
+  return {};
 };
 
 // Get purchase history for the logged-in customer
@@ -45,5 +44,15 @@ export const buyCrop = async (cropId, quantity) => {
     { headers }
   );
 
+  return res.data;
+};
+
+// Get all transactions (admin only)
+export const getAllTransactions = async (searchQuery = '') => {
+  const headers = getAuthHeader();
+  if (!headers.Authorization) {
+    throw new Error('No authorization token found. Please log in.');
+  }
+  const res = await axios.get(API_URL + `all?search=${searchQuery}`, { headers });
   return res.data;
 };

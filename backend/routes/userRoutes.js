@@ -1,14 +1,37 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
-const { protect } = require('../middleware/authMiddleware');
+const { protect, authorize } = require('../middleware/authMiddleware');
+
+// @desc    Get all users
+// @route   GET /api/users
+// @access  Private/Admin
+router.get('/', protect, authorize('admin'), async (req, res) => {
+  try {
+    const { search } = req.query;
+    let query = {};
+    if (search) {
+      query = {
+        $or: [
+          { username: { $regex: search, $options: 'i' } },
+          { phone: { $regex: search, $options: 'i' } },
+          { role: { $regex: search, $options: 'i' } },
+        ],
+      };
+    }
+    const users = await User.find(query).select('-password');
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ error: 'Server Error' });
+  }
+});
 
 // @desc    Get user profile
 // @route   GET /api/users/:id
 // @access  Private
 router.get('/:id', protect, async (req, res) => {
-  // Ensure the logged-in user is requesting their own profile
-  if (req.user.id !== req.params.id) {
+  // Ensure the logged-in user is requesting their own profile or is an admin
+  if (req.user.id !== req.params.id && req.user.role !== 'admin') {
     return res.status(403).json({ error: 'Not authorized to view this profile' });
   }
 
@@ -28,8 +51,8 @@ router.get('/:id', protect, async (req, res) => {
 // @route   PUT /api/users/:id
 // @access  Private
 router.put('/:id', protect, async (req, res) => {
-  // Ensure the logged-in user is updating their own profile
-  if (req.user.id !== req.params.id) {
+  // Ensure the logged-in user is updating their own profile or is an admin
+  if (req.user.id !== req.params.id && req.user.role !== 'admin') {
     return res.status(403).json({ error: 'Not authorized to update this profile' });
   }
 
@@ -61,6 +84,24 @@ router.put('/:id', protect, async (req, res) => {
     }
   } catch (error) {
     res.status(400).json({ error: error.message });
+  }
+});
+
+// @desc    Delete a user
+// @route   DELETE /api/users/:id
+// @access  Private/Admin
+router.delete('/:id', protect, authorize('admin'), async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+
+    if (user) {
+      await user.remove();
+      res.json({ message: 'User removed' });
+    } else {
+      res.status(404).json({ error: 'User not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Server Error' });
   }
 });
 
