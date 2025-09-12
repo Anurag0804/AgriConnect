@@ -33,7 +33,7 @@ export default function PurchaseHistory() {
                   <td className="py-2 px-4 font-semibold">{tx.crop ? tx.crop.name : 'N/A'}</td>
                   <td className="py-2 px-4">{new Date(tx.date).toLocaleDateString()}</td>
                   <td className="py-2 px-4">{tx.quantity}</td>
-                  <td className="py-2 px-4">₹{tx.totalPrice.toFixed(2)}</td>
+                  <td className="py-2 px-4">₹ {tx.totalPrice.toFixed(2)}</td>
                 </tr>
               ))}
             </tbody>

@@ -51,8 +51,8 @@ export default function MyCart() {
               <tr key={order._id} className="border-b border-gray-100">
                 <td className="py-2 px-4 font-semibold">{order.crop.name}</td>
                 <td className="py-2 px-4">{order.quantity}</td>
-                <td className="py-2 px-4">{order.farmer.name}</td>
-                <td className="py-2 px-4">₹{order.totalPrice}</td>
+                <td className="py-2 px-4">{order.farmer.username}</td>
+                <td className="py-2 px-4">₹ {order.totalPrice}</td>
                 <td className="py-2 px-4">{order.status}</td>
               </tr>
             ))}
