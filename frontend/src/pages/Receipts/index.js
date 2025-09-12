@@ -28,7 +28,7 @@ export default function Receipts() {
     } finally {
       setLoading(false);
     }
-  }, [currentUser]);
+  }, [currentUser?.id, currentUser?.role]);;
 
   useEffect(() => {
     if (currentUser) {
