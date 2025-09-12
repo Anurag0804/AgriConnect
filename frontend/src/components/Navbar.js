@@ -25,7 +25,7 @@ export default function Navbar() {
         return '/customer';
       case 'farmer':
         return '/farmer';
-      case 'agency':
+      case 'admin':
         return '/admin'; // Assuming agency maps to admin dashboard
       default:
         return '/';
@@ -39,6 +39,8 @@ export default function Navbar() {
         return 'bg-primary';
       case 'farmer':
         return 'bg-yellow-500';
+      case 'admin':
+        return 'bg-[#8B5C2A]'; // Brown-magenta tone
       default:
         return 'bg-primary';
     }
@@ -50,7 +52,7 @@ export default function Navbar() {
         <Link to={getDashboardPath()} className="text-2xl font-serif font-bold">
           🌾 AgriConnect{" "}
           <span className="text-sm font-light">
-            {user ? user.role === "customer" || user.role === "farmer" ? user.role.toUpperCase() : user.role : ''}
+            {user ? user.role === "customer" || user.role === "farmer" || user.role=="admin" ? user.role.toUpperCase() : user.role : ''}
           </span>
         </Link>
         <div className="space-x-4 flex items-center">

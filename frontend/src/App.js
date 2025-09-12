@@ -29,7 +29,7 @@ function App() {
             <Route
               path="/profile" // Add new route
               element={
-                <ProtectedRoute roles={["customer", "farmer", "agency", "admin"]}>
+                <ProtectedRoute roles={["customer", "farmer", "admin"]}>
                   <Profile />
                 </ProtectedRoute>
               }
@@ -87,11 +87,11 @@ function App() {
               }
             />
 
-            {/* Admin/Agency Routes */}
+            {/* Admin Routes */}
             <Route
               path="/admin"
               element={
-                <ProtectedRoute roles={["agency", "admin"]}>
+                <ProtectedRoute roles={["admin"]}>
                   <DashboardAdmin />
                 </ProtectedRoute>
               }

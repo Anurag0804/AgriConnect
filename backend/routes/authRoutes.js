@@ -43,9 +43,9 @@ router.post('/login', async (req, res) => {
   res.json({ token, role: user.role, userId: user._id });
 });
 
-// Example protected route for agency
-router.get('/agency', protect, authorize('agency'), (req, res) => {
-  res.json({ message: 'Agency route' });
+// Example protected route for admin
+router.get('/admin', protect, authorize('admin'), (req, res) => {
+  res.json({ message: 'Admin route' });
 });
 
 module.exports = router;

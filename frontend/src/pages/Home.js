@@ -16,7 +16,7 @@ export default function Home() {
         case 'farmer':
           navigate('/farmer');
           break;
-        case 'agency':
+        case 'admin':
           navigate('/admin');
           break;
         default:

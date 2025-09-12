@@ -20,7 +20,7 @@ export default function Login() {
       // Navigate based on role
       if (role === 'customer') navigate('/customer');
       else if (role === 'farmer') navigate('/farmer');
-      else if (role === 'agency') navigate('/admin'); // Assuming agency maps to admin dashboard
+      else if (role === 'admin') navigate('/admin');
       else navigate('/');
     } catch (err) {
       setError(err.response?.data?.error || "An error occurred during login.");
