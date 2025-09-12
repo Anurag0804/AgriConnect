@@ -10,7 +10,7 @@ const { protect, authorize } = require('../middleware/authMiddleware');
 router.post('/', protect, authorize('farmer'), async (req, res) => {
   try {
     const { order } = req.body;
-    const orderDoc = await Order.findById(order).populate('user farmer');
+    const orderDoc = await Order.findById(order).populate('customer farmer'); // table customer + farmer -> Receipt
     if (!orderDoc) return res.status(404).json({ error: 'Order not found' });
 
     const receipt = new Receipt({
@@ -38,7 +38,7 @@ router.get('/farmer', protect, authorize('farmer'), async (req, res) => {
         path: 'order',
         select: 'status totalPrice quantity',
         populate: [
-          { path: 'user', select: 'name' },
+          { path: 'customer', select: 'name' },
           { path: 'farmer', select: 'name' },
           { path: 'crop', select: 'name' }
         ]
@@ -53,20 +53,21 @@ router.get('/farmer', protect, authorize('farmer'), async (req, res) => {
 // @route   GET /api/receipts/customer
 // @access  Private (Customer)
 router.get('/customer', protect, authorize('customer'), async (req, res) => {
-  console.log("🛒 Customer receipts request from user:", req.user);
+  console.log("🛒 Customer receipts request from user (decoded JWT payload):", req.user);
   try {
     const receipts = await Receipt.find({ customer: req.user.id })
       .populate({
         path: 'order',
         select: 'status totalPrice quantity',
         populate: [
-          { path: 'user', select: 'name' },
+          { path: 'customer', select: 'name' },
           { path: 'farmer', select: 'name' },
           { path: 'crop', select: 'name' }
         ]
       });
-      console.log("✅ Found receipts:", receipts);
+    console.log("✅ Found receipts:", receipts);
     res.json(receipts);
+
   } catch (error) {
     res.status(500).json({ error: 'Server Error' });
   }
