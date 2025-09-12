@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { getCustomerReceipts, getFarmerReceipts, updateReceiptStatus } from '../../services/receiptService';
 import { getCurrentUser } from '../../services/authService';
 
@@ -8,7 +8,7 @@ export default function Receipts() {
   const [error, setError] = useState('');
   const currentUser = getCurrentUser();
 
-  const fetchReceipts = async () => {
+  const fetchReceipts = useCallback(async () => {
     try {
       setLoading(true);
       let receiptsData = [];
@@ -17,22 +17,22 @@ export default function Receipts() {
       } else if (currentUser.role === 'farmer') {
         receiptsData = await getFarmerReceipts();
       }
-      // normalize confirmed filter
-      const confirmedReceipts = receiptsData.filter(r => r.order?.status?.toLowerCase() === 'confirmed');
-      setReceipts(confirmedReceipts);
+      console.log('Receipts:', receiptsData); // Log receipts data
+      setReceipts(receiptsData);
     } catch (err) {
       setError('Failed to fetch receipts.');
       console.error(err);
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentUser]);
 
   useEffect(() => {
     if (currentUser) {
+      console.log('Current User:', currentUser); // Log current user
       fetchReceipts();
     }
-  }, [currentUser?.userId]);
+  }, [currentUser, fetchReceipts]);
 
   const handlePaymentStatusUpdate = async (receiptId, newStatus) => {
     try {
@@ -58,6 +58,7 @@ export default function Receipts() {
               <h2 className="text-xl font-semibold text-gray-800 mb-2">
                 Receipt for Order ID: {receipt.order._id}
               </h2>
+              <p className="text-gray-600 mb-1"><strong>Order Status:</strong> {receipt.order.status}</p>
               <p className="text-gray-600 mb-1"><strong>Crop:</strong> {receipt.order.crop.name}</p>
               <p className="text-gray-600 mb-1"><strong>Quantity:</strong> {receipt.order.quantity} kg</p>
               <p className="text-gray-600 mb-1"><strong>Total Price:</strong> ₹{receipt.order.totalPrice}</p>
@@ -71,7 +72,7 @@ export default function Receipts() {
                   {receipt.paymentStatus.toUpperCase()}
                 </span>
               </p>
-              {currentUser.role === 'customer' && receipt.paymentStatus === 'unpaid' && (
+              {currentUser.role === 'customer' && receipt.paymentStatus === 'unpaid' && receipt.order.status === 'confirmed' && (
                 <button
                   onClick={() => handlePaymentStatusUpdate(receipt._id, 'paid')}
                   className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300"
@@ -83,7 +84,7 @@ export default function Receipts() {
           ))}
         </div>
       ) : (
-        <p>You have no receipts for confirmed orders.</p>
+        <p>You have no receipts.</p>
       )}
     </div>
   );
