@@ -218,11 +218,19 @@ router.put('/:id', protect, authorize('farmer'), async (req, res) => {
       }
 
       // 4. Create a Receipt
-      const receipt = new Receipt({
-        order: order._id,
-        paymentStatus: 'unpaid' // Default status
-      });
-      await receipt.save({ session }); // Save within the transaction
+      try {
+  const receipt = new Receipt({
+    order: order._id,
+    customer: order.customer,
+    farmer: order.farmer,
+    paymentStatus: 'unpaid'
+  });
+  await receipt.save({ session });
+  console.log("✅ Auto-created receipt:", receipt);
+} catch (error) {
+  console.error("❌ Error creating receipt:", error);
+}
+
     }
 
     const updatedOrder = await order.save({ session });

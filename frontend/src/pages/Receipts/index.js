@@ -12,16 +12,19 @@ export default function Receipts() {
     try {
       setLoading(true);
       let receiptsData = [];
+      console.log("🔍 Current user:", currentUser); // 👈 add this
+      console.log("🔍 Role:", currentUser?.role);
       if (currentUser.role === 'customer') {
         receiptsData = await getCustomerReceipts();
       } else if (currentUser.role === 'farmer') {
         receiptsData = await getFarmerReceipts();
       }
-      console.log('Receipts:', receiptsData); // Log receipts data
-      setReceipts(receiptsData);
+      console.log("✅ API response:", receiptsData);
+      const confirmedReceipts = receiptsData.filter(r => r.order?.status === 'confirmed');
+      setReceipts(confirmedReceipts);
     } catch (err) {
       setError('Failed to fetch receipts.');
-      console.error(err);
+      console.error("❌ fetchReceipts error:", err);
     } finally {
       setLoading(false);
     }
@@ -29,7 +32,6 @@ export default function Receipts() {
 
   useEffect(() => {
     if (currentUser) {
-      console.log('Current User:', currentUser); // Log current user
       fetchReceipts();
     }
   }, [currentUser, fetchReceipts]);
@@ -84,7 +86,7 @@ export default function Receipts() {
           ))}
         </div>
       ) : (
-        <p>You have no receipts.</p>
+        <p>You have no receipts for confirmed orders.</p>
       )}
     </div>
   );
