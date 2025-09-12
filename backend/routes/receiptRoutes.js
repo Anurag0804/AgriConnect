@@ -38,8 +38,8 @@ router.get('/farmer', protect, authorize('farmer'), async (req, res) => {
         path: 'order',
         select: 'status totalPrice quantity',
         populate: [
-          { path: 'customer', select: 'name' },
-          { path: 'farmer', select: 'name' },
+          { path: 'customer', select: 'username' },
+          { path: 'farmer', select: 'username' },
           { path: 'crop', select: 'name' }
         ]
       });
@@ -60,8 +60,8 @@ router.get('/customer', protect, authorize('customer'), async (req, res) => {
         path: 'order',
         select: 'status totalPrice quantity',
         populate: [
-          { path: 'customer', select: 'name' },
-          { path: 'farmer', select: 'name' },
+          { path: 'customer', select: 'username' },
+          { path: 'farmer', select: 'username' },
           { path: 'crop', select: 'name' }
         ]
       });
