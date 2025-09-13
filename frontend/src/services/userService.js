@@ -1,7 +1,7 @@
-import axios from 'axios';
+import http from './http';
 import { getCurrentUser } from './authService';
 
-const API_URL = "http://localhost:5000/api/users/";
+const API_URL = "/users/";
 
 // Helper to get the auth token
 const getAuthHeader = () => {
@@ -19,7 +19,7 @@ export const getUser = async (userId) => {
   if (!headers.Authorization) {
     throw new Error('No authorization token found. Please log in.');
   }
-  const res = await axios.get(API_URL + userId, { headers });
+  const res = await http.get(API_URL + userId, { headers });
   return res.data;
 };
 
@@ -29,7 +29,7 @@ export const updateUser = async (userId, userData) => {
   if (!headers.Authorization) {
     throw new Error('No authorization token found. Please log in.');
   }
-  const res = await axios.put(API_URL + userId, userData, { headers });
+  const res = await http.put(API_URL + userId, userData, { headers });
   return res.data;
 };
 
@@ -40,7 +40,7 @@ export const getAllUsers = async (searchQuery = '') => {
   if (!headers.Authorization) {
     throw new Error('No authorization token found. Please log in.');
   }
-  const res = await axios.get(API_URL + `?search=${searchQuery}`, { headers });
+  const res = await http.get(API_URL + `?search=${searchQuery}`, { headers });
   return res.data;
 };
 
@@ -50,7 +50,7 @@ export const deleteUser = async (userId) => {
   if (!headers.Authorization) {
     throw new Error('No authorization token found. Please log in.');
   }
-  const res = await axios.delete(API_URL + userId, { headers });
+  const res = await http.delete(API_URL + userId, { headers });
   return res.data;
 };
 

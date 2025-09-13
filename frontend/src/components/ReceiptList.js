@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getAllReceipts } from '../services/receiptService';
+import { getAllReceipts, deleteReceipt } from '../services/receiptService';
 
 export default function ReceiptList({ searchTerm }) {
   const [receipts, setReceipts] = useState([]);
@@ -23,6 +23,18 @@ export default function ReceiptList({ searchTerm }) {
     }
   };
 
+  const handleDelete = async (receiptId) => {
+    if (window.confirm('Are you sure you want to delete this receipt?')) {
+      try {
+        await deleteReceipt(receiptId);
+        fetchReceipts();
+      } catch (err) {
+        setError('Failed to delete receipt.');
+        console.error(err);
+      }
+    }
+  };
+
   if (loading) {
     return <div>Loading receipts...</div>;
   }
@@ -42,16 +54,20 @@ export default function ReceiptList({ searchTerm }) {
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Farmer</th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment Status</th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
           {receipts.map((receipt) => (
             <tr key={receipt._id}>
-              <td className="px-6 py-4 whitespace-nowrap">{receipt.order}</td>
-              <td className="px-6 py-4 whitespace-nowrap">{receipt.customer?.username}</td>
-              <td className="px-6 py-4 whitespace-nowrap">{receipt.farmer?.username}</td>
+              <td className="px-6 py-4 whitespace-nowrap">{receipt.order?._id}</td>
+              <td className="px-6 py-4 whitespace-nowrap">{receipt.order?.customer?.username}</td>
+              <td className="px-6 py-4 whitespace-nowrap">{receipt.order?.farmer?.username}</td>
               <td className="px-6 py-4 whitespace-nowrap">{receipt.paymentStatus}</td>
               <td className="px-6 py-4 whitespace-nowrap">{new Date(receipt.createdAt).toLocaleDateString()}</td>
+              <td className="px-6 py-4 whitespace-nowrap">
+                <button onClick={() => handleDelete(receipt._id)} className="text-red-600 hover:text-red-900 ml-4">Delete</button>
+              </td>
             </tr>
           ))}
         </tbody>

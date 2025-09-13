@@ -1,7 +1,7 @@
-import axios from 'axios';
+import http from './http';
 import { getCurrentUser } from './authService';
 
-const API_URL = "http://localhost:5000/api/transactions/";
+const API_URL = "/transactions/";
 
 // Helper to get the auth token
 const getAuthHeader = () => {
@@ -18,7 +18,7 @@ export const getCustomerTransactions = async () => {
   if (!headers.Authorization) {
     throw new Error('No authorization token found. Please log in.');
   }
-  const res = await axios.get(API_URL + 'history/customer', { headers });
+  const res = await http.get(API_URL + 'history/customer', { headers });
   return res.data;
 };
 
@@ -28,7 +28,7 @@ export const getFarmerTransactions = async () => {
   if (!headers.Authorization) {
     throw new Error('No authorization token found. Please log in.');
   }
-  const res = await axios.get(API_URL + 'history/farmer', { headers });
+  const res = await http.get(API_URL + 'history/farmer', { headers });
   return res.data;
 };
 
@@ -38,7 +38,7 @@ export const buyCrop = async (cropId, quantity) => {
     throw new Error('No authorization token found. Please log in.');
   }
 
-  const res = await axios.post(
+  const res = await http.post(
     API_URL,
     { cropId, quantity },
     { headers }
@@ -53,6 +53,6 @@ export const getAllTransactions = async (searchQuery = '') => {
   if (!headers.Authorization) {
     throw new Error('No authorization token found. Please log in.');
   }
-  const res = await axios.get(API_URL + `all?search=${searchQuery}`, { headers });
+  const res = await http.get(API_URL + `all?search=${searchQuery}`, { headers });
   return res.data;
 };

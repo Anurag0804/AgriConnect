@@ -1,12 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { getCurrentUser, logout } from "../services/authService";
-import { LayoutDashboard, User, LogOut } from "lucide-react";
+import { LayoutDashboard, User, LogOut, ReceiptIndianRupee, Notebook } from "lucide-react";
+import GlobalContext from "../context/GlobalState";
+import LoadingSpinner from "./LoadingSpinner";
 
 export default function Navbar() {
   const [user, setUser] = useState(getCurrentUser());
   const navigate = useNavigate();
   const location = useLocation();
+  const { loading } = useContext(GlobalContext);
 
   useEffect(() => {
     setUser(getCurrentUser());
@@ -56,6 +59,7 @@ export default function Navbar() {
           </span>
         </Link>
         <div className="space-x-4 flex items-center">
+          {loading && <LoadingSpinner />}
           {user ? (
             user.role === 'admin' ? (
               <>
@@ -86,11 +90,11 @@ export default function Navbar() {
                   Profile
                 </Link>
                 <Link to="/orders" className="hover:text-gray-300">
-                  <LayoutDashboard className="inline-block mr-2" />
+                  <Notebook className="inline-block mr-2" />
                   Orders
                 </Link>
                 <Link to="/receipts" className="hover:text-gray-300">
-                  <LayoutDashboard className="inline-block mr-2" />
+                  <ReceiptIndianRupee className="inline-block mr-2" />
                   Receipts
                 </Link>
                 <button

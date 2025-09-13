@@ -1,7 +1,7 @@
-import axios from 'axios';
+import http from './http';
 import { getCurrentUser } from './authService';
 
-const API_URL = "http://localhost:5000/api/analytics/";
+const API_URL = "/analytics/";
 
 // Helper to get the auth token
 const getAuthHeader = () => {
@@ -18,6 +18,6 @@ export const getPlatformStats = async () => {
   if (!headers.Authorization) {
     throw new Error('No authorization token found. Please log in.');
   }
-  const res = await axios.get(API_URL + 'stats', { headers });
+  const res = await http.get(API_URL + 'stats', { headers });
   return res.data;
 };

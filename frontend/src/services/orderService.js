@@ -1,7 +1,7 @@
-import axios from 'axios';
+import http from './http';
 import { getCurrentUser } from './authService';
 
-const API_URL = "http://localhost:5000/api/orders/";
+const API_URL = "/orders/";
 
 // Helper to get the auth token
 const getAuthHeader = () => {
@@ -18,7 +18,7 @@ export const createOrder = async (orderData) => {
   if (!headers.Authorization) {
     throw new Error('No authorization token found. Please log in.');
   }
-  const res = await axios.post(API_URL, orderData, { headers });
+  const res = await http.post(API_URL, orderData, { headers });
   return res.data;
 };
 
@@ -28,7 +28,7 @@ export const getFarmerOrders = async () => {
   if (!headers.Authorization) {
     throw new Error('No authorization token found. Please log in.');
   }
-  const res = await axios.get(API_URL + 'farmer', { headers });
+  const res = await http.get(API_URL + 'farmer', { headers });
   return res.data;
 };
 
@@ -38,7 +38,7 @@ export const getCustomerOrders = async () => {
   if (!headers.Authorization) {
     throw new Error('No authorization token found. Please log in.');
   }
-  const res = await axios.get(API_URL + 'customer', { headers });
+  const res = await http.get(API_URL + 'customer', { headers });
   return res.data;
 };
 
@@ -48,7 +48,7 @@ export const updateOrderStatus = async (orderId, status) => {
   if (!headers.Authorization) {
     throw new Error('No authorization token found. Please log in.');
   }
-  const res = await axios.put(API_URL + orderId, { status }, { headers });
+  const res = await http.put(API_URL + orderId, { status }, { headers });
   return res.data;
 };
 
@@ -58,6 +58,6 @@ export const getAllOrders = async (searchQuery = '') => {
   if (!headers.Authorization) {
     throw new Error('No authorization token found. Please log in.');
   }
-  const res = await axios.get(API_URL + `all?search=${searchQuery}`, { headers });
+  const res = await http.get(API_URL + `all?search=${searchQuery}`, { headers });
   return res.data;
 };

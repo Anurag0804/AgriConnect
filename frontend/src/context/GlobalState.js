@@ -5,7 +5,7 @@ const initialState = {
   orders: [],
   transactions: [],
   inventory: [],
-  loading: true,
+  loading: false, // Set initial loading to false
   error: null,
 };
 
@@ -13,6 +13,10 @@ const GlobalContext = createContext(initialState);
 
 const globalReducer = (state, action) => {
   switch (action.type) {
+    case 'SET_LOADING':
+      return { ...state, loading: true };
+    case 'CLEAR_LOADING':
+      return { ...state, loading: false };
     case 'FETCH_SUCCESS':
       return {
         ...state,
@@ -33,7 +37,21 @@ const globalReducer = (state, action) => {
 export const GlobalProvider = ({ children }) => {
   const [state, dispatch] = useReducer(globalReducer, initialState);
 
+  useEffect(() => {
+    const startLoading = () => dispatch({ type: 'SET_LOADING' });
+    const stopLoading = () => dispatch({ type: 'CLEAR_LOADING' });
+
+    window.addEventListener('loading-start', startLoading);
+    window.addEventListener('loading-stop', stopLoading);
+
+    return () => {
+      window.removeEventListener('loading-start', startLoading);
+      window.removeEventListener('loading-stop', stopLoading);
+    };
+  }, []);
+
   const fetchData = useCallback(async () => {
+    dispatch({ type: 'SET_LOADING' });
     try {
       const [orders, transactions, inventory] = await Promise.all([
         getOrders(),
