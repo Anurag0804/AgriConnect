@@ -97,4 +97,31 @@ router.get('/history/farmer', protect, authorize('farmer'), async (req, res) => 
     }
 });
 
+// @desc    Get all transactions (Admin)
+// @route   GET /api/transactions/all
+// @access  Private (Admin)
+router.get('/all', protect, authorize('admin'), async (req, res) => {
+    try {
+        const { search } = req.query;
+        let query = {};
+        if (search) {
+            query = {
+                $or: [
+                    { 'crop.name': { $regex: search, $options: 'i' } },
+                    { 'customer.username': { $regex: search, $options: 'i' } },
+                    { 'farmer.username': { $regex: search, $options: 'i' } },
+                ],
+            };
+        }
+        const transactions = await Transaction.find(query)
+            .populate('crop', 'name')
+            .populate('customer', 'username')
+            .populate('farmer', 'username')
+            .sort({ date: -1 });
+        res.json(transactions);
+    } catch (error) {
+        res.status(500).json({ error: 'Server Error' });
+    }
+});
+
 module.exports = router;

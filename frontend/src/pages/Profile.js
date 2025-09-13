@@ -67,7 +67,7 @@ export default function Profile() {
     switch (currentUser.role) {
       case 'customer': return '/customer';
       case 'farmer': return '/farmer';
-      case 'agency': return '/admin';
+      case 'admin': return '/admin';
       default: return '/';
     }
   };

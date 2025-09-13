@@ -1,7 +1,7 @@
-import axios from 'axios';
+import http from './http';
 import { getCurrentUser } from './authService';
 
-const API_URL = "http://localhost:5000/api/crops/";
+const API_URL = "/crops/";
 
 // Helper to get the auth token
 const getAuthHeader = () => {
@@ -15,7 +15,7 @@ const getAuthHeader = () => {
 
 // Get all available crops for the marketplace with filtering
 export const getCrops = async (params) => {
-  const res = await axios.get(API_URL, { params });
+  const res = await http.get(API_URL, { params });
   return res.data;
 };
 
@@ -25,7 +25,7 @@ export const createCrop = async (cropData) => {
   if (!headers.Authorization) {
     throw new Error('No authorization token found. Please log in.');
   }
-  const res = await axios.post(API_URL, cropData, { headers });
+  const res = await http.post(API_URL, cropData, { headers });
   return res.data;
 };
 
@@ -35,6 +35,36 @@ export const getFarmerCrops = async (farmerId) => {
   if (!headers.Authorization) {
     throw new Error('No authorization token found. Please log in.');
   }
-  const res = await axios.get(API_URL + `farmer/${farmerId}`, { headers });
+  const res = await http.get(API_URL + `farmer/${farmerId}`, { headers });
+  return res.data;
+};
+
+// Get all crops (admin only)
+export const getAllCrops = async (searchQuery = '') => {
+  const headers = getAuthHeader();
+  if (!headers.Authorization) {
+    throw new Error('No authorization token found. Please log in.');
+  }
+  const res = await http.get(API_URL + `all?search=${searchQuery}`, { headers });
+  return res.data;
+};
+
+// Update a crop (admin only)
+export const updateCrop = async (cropId, cropData) => {
+  const headers = getAuthHeader();
+  if (!headers.Authorization) {
+    throw new Error('No authorization token found. Please log in.');
+  }
+  const res = await http.put(API_URL + cropId, cropData, { headers });
+  return res.data;
+};
+
+// Delete a crop (admin only)
+export const deleteCrop = async (cropId) => {
+  const headers = getAuthHeader();
+  if (!headers.Authorization) {
+    throw new Error('No authorization token found. Please log in.');
+  }
+  const res = await http.delete(API_URL + cropId, { headers });
   return res.data;
 };

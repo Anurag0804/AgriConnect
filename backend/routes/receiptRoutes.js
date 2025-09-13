@@ -93,4 +93,44 @@ router.put('/:id', protect, authorize('customer'), async (req, res) => {
   }
 });
 
+
+// @desc    Get all receipts (admin)
+// @route   GET /api/receipts/all
+// @access  Private (Admin)
+router.get('/all', protect, authorize('admin'), async (req, res) => {
+  try {
+    const receipts = await Receipt.find({})
+      .populate({
+        path: 'order',
+        select: 'status totalPrice quantity',
+        populate: [
+          { path: 'customer', select: 'username' },
+          { path: 'farmer', select: 'username' },
+          { path: 'crop', select: 'name' }
+        ]
+      });
+    res.json(receipts);
+  } catch (error) {
+    res.status(500).json({ error: 'Server Error' });
+  }
+});
+
+// @desc    Delete a receipt
+// @route   DELETE /api/receipts/:id
+// @access  Private (Admin)
+router.delete('/:id', protect, authorize('admin'), async (req, res) => {
+  try {
+    const receipt = await Receipt.findById(req.params.id);
+
+    if (receipt) {
+      await Receipt.deleteOne({ _id: req.params.id });
+      res.json({ message: 'Receipt removed' });
+    } else {
+      res.status(404).json({ error: 'Receipt not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Server Error' });
+  }
+});
+
 module.exports = router;

@@ -16,7 +16,7 @@ export default function Home() {
         case 'farmer':
           navigate('/farmer');
           break;
-        case 'agency':
+        case 'admin':
           navigate('/admin');
           break;
         default:
@@ -30,7 +30,7 @@ export default function Home() {
       {/* Hero Section */}
       <section className="text-center py-20 px-4 flex-grow">
         <h1 className="text-5xl md:text-6xl font-serif font-bold text-primary mb-6">
-          Welcome to AgriConnect 🌾
+          Welcome to AgriConnect 
         </h1>
         <p className="text-lg md:text-xl mb-8 text-gray-700 max-w-2xl mx-auto">
           A digital platform that bridges the gap between <span className="font-semibold">Farmers</span>,{" "}

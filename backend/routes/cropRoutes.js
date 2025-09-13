@@ -5,8 +5,8 @@ const { protect, authorize } = require('../middleware/authMiddleware');
 
 // @desc    Create a new crop listing
 // @route   POST /api/crops
-// @access  Private (Farmer)
-router.post('/', protect, authorize('farmer'), async (req, res) => {
+// @access  Private (Farmer or Admin)
+router.post('/', protect, authorize('farmer', 'admin'), async (req, res) => {
   try {
     const { name, stock, pricePerKg, location } = req.body;
     const crop = new Crop({
@@ -82,12 +82,34 @@ router.get('/', async (req, res) => {
   }
 });
 
+// @desc    Get all crops (Admin)
+// @route   GET /api/crops/all
+// @access  Private (Admin)
+router.get('/all', protect, authorize('admin'), async (req, res) => {
+  try {
+    const { search } = req.query;
+    let query = {};
+    if (search) {
+      query = {
+        $or: [
+          { name: { $regex: search, $options: 'i' } },
+          { location: { $regex: search, $options: 'i' } },
+        ],
+      };
+    }
+    const crops = await Crop.find(query).populate('farmer', 'username address');
+    res.json(crops);
+  } catch (error) {
+    res.status(500).json({ error: 'Server Error' });
+  }
+});
+
 // @desc    Get all crops for a specific farmer (Farmer's Inventory)
 // @route   GET /api/crops/farmer/:farmerId
 // @access  Private
 router.get('/farmer/:farmerId', protect, async (req, res) => {
     // Ensure the logged-in user is the one requesting their crops
-    if (req.user.id !== req.params.farmerId) {
+    if (req.user.id !== req.params.farmerId && req.user.role !== 'admin') {
         return res.status(403).json({ error: 'Not authorized to view this inventory' });
     }
     try {
@@ -117,15 +139,15 @@ router.get('/:id', async (req, res) => {
 
 // @desc    Update a crop listing
 // @route   PUT /api/crops/:id
-// @access  Private (Farmer)
-router.put('/:id', protect, authorize('farmer'), async (req, res) => {
+// @access  Private (Farmer or Admin)
+router.put('/:id', protect, authorize('farmer', 'admin'), async (req, res) => {
   try {
     const { name, stock, pricePerKg, location } = req.body;
     const crop = await Crop.findById(req.params.id);
 
     if (crop) {
-      // Check if the farmer owns the crop listing
-      if (crop.farmer.toString() !== req.user.id) {
+      // Check if the farmer owns the crop listing or if the user is an admin
+      if (crop.farmer.toString() !== req.user.id && req.user.role !== 'admin') {
         return res.status(403).json({ error: 'Not authorized to update this crop' });
       }
       crop.name = name || crop.name;
@@ -145,14 +167,14 @@ router.put('/:id', protect, authorize('farmer'), async (req, res) => {
 
 // @desc    Delete a crop listing
 // @route   DELETE /api/crops/:id
-// @access  Private (Farmer)
-router.delete('/:id', protect, authorize('farmer'), async (req, res) => {
+// @access  Private (Farmer or Admin)
+router.delete('/:id', protect, authorize('farmer', 'admin'), async (req, res) => {
   try {
     const crop = await Crop.findById(req.params.id);
 
     if (crop) {
-      // Check if the farmer owns the crop listing
-      if (crop.farmer.toString() !== req.user.id) {
+      // Check if the farmer owns the crop listing or if the user is an admin
+      if (crop.farmer.toString() !== req.user.id && req.user.role !== 'admin') {
         return res.status(403).json({ error: 'Not authorized to delete this crop' });
       }
       await crop.deleteOne(); // Using deleteOne() instead of remove() which is deprecated

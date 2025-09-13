@@ -1,15 +1,14 @@
-import axios from 'axios';
+import http from './http';
 import { getCurrentUser } from './authService';
 
-const API_URL = "http://localhost:5000/api/receipts/";
+const API_URL = "/receipts/";
 
 const getAuthHeader = () => {
   const user = getCurrentUser();
   if (user && user.token) {
     return { Authorization: 'Bearer ' + user.token };
-  } else {
-    return {};
   }
+  return {};
 };
 
 export const createReceipt = async (orderId) => {
@@ -17,7 +16,7 @@ export const createReceipt = async (orderId) => {
   if (!headers.Authorization) {
     throw new Error('No authorization token found. Please log in.');
   }
-  const res = await axios.post(API_URL, { order: orderId }, { headers });
+  const res = await http.post(API_URL, { order: orderId }, { headers });
   return res.data;
 };
 
@@ -26,7 +25,7 @@ export const getFarmerReceipts = async () => {
   if (!headers.Authorization) {
     throw new Error('No authorization token found. Please log in.');
   }
-  const res = await axios.get(API_URL + 'farmer', { headers });
+  const res = await http.get(API_URL + 'farmer', { headers });
   return res.data;
 };
 
@@ -35,7 +34,7 @@ export const getCustomerReceipts = async () => {
   if (!headers.Authorization) {
     throw new Error('No authorization token found. Please log in.');
   }
-  const res = await axios.get(API_URL + 'customer', { headers });
+  const res = await http.get(API_URL + 'customer', { headers });
   return res.data;
 };
 
@@ -44,6 +43,25 @@ export const updateReceiptStatus = async (receiptId, paymentStatus) => {
   if (!headers.Authorization) {
     throw new Error('No authorization token found. Please log in.');
   }
-  const res = await axios.put(API_URL + receiptId, { paymentStatus }, { headers });
+  const res = await http.put(API_URL + receiptId, { paymentStatus }, { headers });
+  return res.data;
+};
+
+// Get all receipts (admin only)
+export const getAllReceipts = async (searchQuery = '') => {
+  const headers = getAuthHeader();
+  if (!headers.Authorization) {
+    throw new Error('No authorization token found. Please log in.');
+  }
+  const res = await http.get(API_URL + `all?search=${searchQuery}`, { headers });
+  return res.data;
+};
+
+export const deleteReceipt = async (receiptId) => {
+  const headers = getAuthHeader();
+  if (!headers.Authorization) {
+    throw new Error('No authorization token found. Please log in.');
+  }
+  const res = await http.delete(API_URL + receiptId, { headers });
   return res.data;
 };

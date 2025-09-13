@@ -6,6 +6,7 @@ const cropRoutes = require('./routes/cropRoutes');
 const userRoutes = require('./routes/userRoutes');
 const transactionRoutes = require('./routes/transactionRoutes');
 const inventoryRoutes = require('./routes/inventoryRoutes');
+const analyticsRoutes = require('./routes/analyticsRoutes');
 const cors = require('cors');
 
 // Load env from the same directory as server.js
@@ -28,6 +29,7 @@ app.use('/api/transactions', transactionRoutes);
 app.use('/api/inventory', inventoryRoutes);
 app.use('/api/orders', require('./routes/orderRoutes'));
 app.use('/api/receipts', require('./routes/receiptRoutes'));
+app.use('/api/analytics', analyticsRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

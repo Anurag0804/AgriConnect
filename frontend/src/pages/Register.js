@@ -29,7 +29,9 @@ export default function Register() {
         navigate("/login");
       }, 2000);
     } catch (err) {
-      setError(err.response?.data?.error || "An error occurred during registration.");
+      setError(
+        err.response?.data?.error || "An error occurred during registration."
+      );
     } finally {
       setLoading(false);
     }
@@ -100,7 +102,7 @@ export default function Register() {
             >
               <option value="customer">Customer</option>
               <option value="farmer">Farmer</option>
-              <option value="agency">Agency</option>
+              <option value="admin">Admin</option>
             </select>
           </div>
 
