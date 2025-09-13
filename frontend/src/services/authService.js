@@ -10,12 +10,14 @@ export const login = async (data) => {
   const res = await http.post(API_URL + "login", data);
   if (res.data.token) {
     localStorage.setItem("user", JSON.stringify(res.data));
+    window.dispatchEvent(new CustomEvent('user-changed'));
   }
   return res.data;
 };
 
 export const logout = () => {
   localStorage.removeItem("user");
+  window.dispatchEvent(new CustomEvent('user-changed'));
 };
 
 export const getCurrentUser = () => {

@@ -1,5 +1,6 @@
 import React, { createContext, useReducer, useEffect, useCallback } from 'react';
 import { getOrders, getTransactions, getInventory } from '../services/api'; // Assuming you have an api service
+import { getCurrentUser } from '../services/authService';
 
 const initialState = {
   orders: [],
@@ -65,7 +66,19 @@ export const GlobalProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    fetchData();
+    const handleUserChange = () => {
+      const user = getCurrentUser();
+      if (user) {
+        fetchData();
+      }
+    };
+
+    window.addEventListener('user-changed', handleUserChange);
+    handleUserChange(); // Initial fetch
+
+    return () => {
+      window.removeEventListener('user-changed', handleUserChange);
+    };
   }, [fetchData]);
 
   return (

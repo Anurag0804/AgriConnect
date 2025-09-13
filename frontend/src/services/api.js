@@ -5,6 +5,7 @@ import { getCurrentUser } from './authService';
 
 export const getOrders = async () => {
   const user = getCurrentUser();
+  if (!user) return [];
   if (user.role === 'farmer') {
     return getFarmerOrders();
   } else {
@@ -14,6 +15,7 @@ export const getOrders = async () => {
 
 export const getTransactions = async () => {
   const user = getCurrentUser();
+  if (!user) return [];
   if (user.role === 'farmer') {
     return getFarmerTransactions();
   } else {
@@ -23,6 +25,7 @@ export const getTransactions = async () => {
 
 export const getInventory = async () => {
   const user = getCurrentUser();
+  if (!user) return [];
   if (user.role === 'customer') {
     return getCustomerInventory();
   } else {
