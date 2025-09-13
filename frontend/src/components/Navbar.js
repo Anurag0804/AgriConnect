@@ -52,9 +52,10 @@ export default function Navbar() {
   return (
     <nav className={`${getNavbarColor()} text-white shadow-lg sticky top-0 z-50`}>
       <div className="container mx-auto flex justify-between items-center px-4 py-3">
-        <Link to={getDashboardPath()} className="text-2xl font-serif font-bold">
-          🌾 AgriConnect{" "}
-          <span className="text-sm font-light">
+        <Link to={getDashboardPath()} className="text-2xl font-serif font-bold flex items-center">
+          <img src="/logo192.png" alt="AgriConnect Logo" className="h-8 w-8 mr-2" />
+          AgriConnect{" "}
+          <span className="text-sm font-light ml-2">
             {user ? user.role.toUpperCase() : ''}
           </span>
         </Link>
