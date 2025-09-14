@@ -3,7 +3,6 @@ const router = express.Router();
 const User = require('../models/User');
 const { protect, authorize } = require('../middleware/authMiddleware');
 const { uploadImage } = require('../utils/cloudinary');
-const asyncHandler = require('express-async-handler');
 
 // @desc    Get all users
 // @route   GET /api/users
@@ -27,84 +26,6 @@ router.get('/', protect, authorize('admin'), async (req, res) => {
     res.status(500).json({ error: 'Server Error' });
   }
 });
-
-// @desc    Get nearest farmers
-// @route   GET /api/users/nearest-farmers
-// @access  Private
-router.get('/nearest-farmers', protect, asyncHandler(async (req, res) => {
-  const { lat, lon, radius = 10000 } = req.query; // radius in meters, default 10km
-
-  if (!lat || !lon) {
-    return res.status(400).json({ message: 'Latitude and longitude are required.' });
-  }
-
-  const latitude = parseFloat(lat);
-  const longitude = parseFloat(lon);
-  const searchRadius = parseInt(radius);
-
-  if (isNaN(latitude) || isNaN(longitude) || isNaN(searchRadius)) {
-    return res.status(400).json({ message: 'Invalid latitude, longitude, or radius.' });
-  }
-
-  try {
-    const farmers = await User.find({
-      role: 'farmer',
-      location: {
-        $near: {
-          $geometry: {
-            type: 'Point',
-            coordinates: [longitude, latitude],
-          },
-          $maxDistance: searchRadius,
-        },
-      },
-    }).select('-password'); // Exclude password from the result
-
-    res.status(200).json(farmers);
-  } catch (error) {
-    console.error('Error fetching nearest farmers:', error);
-    res.status(500).json({ message: 'Failed to fetch nearest farmers.' });
-  }
-}));
-
-// @desc    Get nearest customers
-// @route   GET /api/users/nearest-customers
-// @access  Private
-router.get('/nearest-customers', protect, asyncHandler(async (req, res) => {
-  const { lat, lon, radius = 10000 } = req.query; // radius in meters, default 10km
-
-  if (!lat || !lon) {
-    return res.status(400).json({ message: 'Latitude and longitude are required.' });
-  }
-
-  const latitude = parseFloat(lat);
-  const longitude = parseFloat(lon);
-  const searchRadius = parseInt(radius);
-
-  if (isNaN(latitude) || isNaN(longitude) || isNaN(searchRadius)) {
-    return res.status(400).json({ message: 'Invalid latitude, longitude, or radius.' });
-  }
-
-  try {
-    const customers = await User.find({
-      role: 'customer',
-      location: {
-        $near: {
-          $geometry: {
-            type: 'Point',
-            coordinates: [longitude, latitude],
-          },
-          $maxDistance: searchRadius,
-        },
-      },
-    }).select('-password'); // Exclude password from the result
-
-    res.status(200).json(customers);
-  } catch (error) {
-    console.error('Error fetching nearest customers:', error);
-    res.status(500).json({ message: 'Failed to fetch nearest customers.' });
-  }
-}));
 
 // @desc    Get user profile
 // @route   GET /api/users/:id
@@ -149,24 +70,6 @@ router.put('/:id', protect, async (req, res) => {
         user.profilePicture = '';
       }
 
-      // Update location if provided
-      if (req.body.latitude && req.body.longitude) {
-        const latitude = parseFloat(req.body.latitude);
-        const longitude = parseFloat(req.body.longitude);
-
-        if (!isNaN(latitude) && !isNaN(longitude)) {
-          user.location = {
-            type: 'Point',
-            coordinates: [longitude, latitude],
-          };
-        } else {
-          return res.status(400).json({ error: 'Invalid latitude or longitude provided.' });
-        }
-      } else if (req.body.latitude === null || req.body.longitude === null) {
-        // Allow clearing location if explicitly set to null
-        user.location = undefined;
-      }
-
       const updatedUser = await user.save();
       res.json({
         _id: updatedUser._id,
@@ -177,7 +80,6 @@ router.put('/:id', protect, async (req, res) => {
         address: updatedUser.address,
         profilePicture: updatedUser.profilePicture,
         defaultLandSize: updatedUser.defaultLandSize,
-        location: updatedUser.location, // Include location in response
       });
     } else {
       res.status(404).json({ error: 'User not found' });
