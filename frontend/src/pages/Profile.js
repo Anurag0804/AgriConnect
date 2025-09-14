@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { getUser, updateUser } from '../services/userService';
+import { getUser, updateUser, updateProfilePicture } from '../services/userService';
 import { getCurrentUser } from '../services/authService';
 import { Link } from 'react-router-dom';
 import { Edit, User } from 'lucide-react';
@@ -52,8 +52,8 @@ export default function Profile() {
       const reader = new FileReader();
       reader.onloadend = async () => {
         try {
-          await updateUser(currentUser.userId, { profilePicture: reader.result });
-          setProfile({ ...profile, profilePicture: reader.result });
+          const response = await updateProfilePicture(currentUser.userId, reader.result);
+          setProfile({ ...profile, profilePicture: response.profilePicture });
         } catch (err) {
           setError('Failed to upload profile picture.');
           console.error(err);
@@ -65,6 +65,16 @@ export default function Profile() {
 
   const handleProfilePicClick = () => {
     fileInputRef.current.click();
+  };
+
+  const handleRemoveProfilePicture = async () => {
+    try {
+      await updateUser(currentUser.userId, { profilePicture: '' });
+      setProfile({ ...profile, profilePicture: '' });
+    } catch (err) {
+      setError('Failed to remove profile picture.');
+      console.error(err);
+    }
   };
 
   if (loading) {
@@ -108,6 +118,10 @@ export default function Profile() {
             <h1 className="text-3xl font-bold text-primary">{profile.username}</h1>
             <p className="text-gray-500">{currentUser.role}</p>
           </div>
+        </div>
+        <div className="flex space-x-2 mb-6">
+            <button onClick={handleProfilePicClick} className="bg-blue-500 text-white px-4 py-2 rounded-lg">Change Photo</button>
+            {profile.profilePicture && <button onClick={handleRemoveProfilePicture} className="bg-red-500 text-white px-4 py-2 rounded-lg">Remove Photo</button>}
         </div>
         
         <div className="space-y-4">
