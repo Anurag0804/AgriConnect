@@ -1,19 +1,20 @@
-import { useState, useEffect } from 'react';
-import { getUser, updateUser } from '../services/userService';
+import { useState, useEffect, useRef } from 'react';
+import { getUser, updateUser, updateProfilePicture } from '../services/userService';
 import { getCurrentUser } from '../services/authService';
 import { Link } from 'react-router-dom';
+import { Edit, User } from 'lucide-react';
 
 export default function Profile() {
   const [profile, setProfile] = useState({
     username: '',
     phone: '',
-    gender: '',
     address: '',
+    defaultLandSize: '',
     profilePicture: ''
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const fileInputRef = useRef(null);
 
   const currentUser = getCurrentUser();
 
@@ -30,8 +31,8 @@ export default function Profile() {
         setProfile({
           username: data.username || '',
           phone: data.phone || '',
-          gender: data.gender || '',
           address: data.address || '',
+          defaultLandSize: data.defaultLandSize || '',
           profilePicture: data.profilePicture || ''
         });
       } catch (err) {
@@ -45,30 +46,34 @@ export default function Profile() {
     fetchProfile();
   }, [currentUser]);
 
-  const handleChange = (e) => {
-    setProfile({ ...profile, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    setSuccess('');
-    try {
-      await updateUser(currentUser.userId, profile);
-      setSuccess('Profile updated successfully!');
-    } catch (err) {
-      setError(err.response?.data?.error || 'Failed to update profile.');
-      console.error(err);
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        try {
+          const response = await updateProfilePicture(currentUser.userId, reader.result);
+          setProfile({ ...profile, profilePicture: response.profilePicture });
+        } catch (err) {
+          setError('Failed to upload profile picture.');
+          console.error(err);
+        }
+      };
+      reader.readAsDataURL(file);
     }
   };
 
-  const getDashboardPath = () => {
-    if (!currentUser) return "/";
-    switch (currentUser.role) {
-      case 'customer': return '/customer';
-      case 'farmer': return '/farmer';
-      case 'admin': return '/admin';
-      default: return '/';
+  const handleProfilePicClick = () => {
+    fileInputRef.current.click();
+  };
+
+  const handleRemoveProfilePicture = async () => {
+    try {
+      await updateUser(currentUser.userId, { profilePicture: '' });
+      setProfile({ ...profile, profilePicture: '' });
+    } catch (err) {
+      setError('Failed to remove profile picture.');
+      console.error(err);
     }
   };
 
@@ -76,80 +81,72 @@ export default function Profile() {
     return <div className="text-center p-8">Loading your profile...</div>;
   }
 
+  if (error) {
+    return <div className="text-center p-8 text-red-500">{error}</div>;
+  }
+
   return (
     <div className="container mx-auto max-w-2xl">
-      <h1 className="text-3xl font-bold text-primary mb-6">Edit Profile</h1>
       <div className="bg-white p-8 rounded-lg shadow-md border border-gray-200">
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Username</label>
-            <input
-              type="text"
-              name="username"
-              value={profile.username}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-lg"
+        <div className="flex items-center space-x-4 mb-6">
+          <div className="relative">
+            {profile.profilePicture ? (
+              <img 
+                src={profile.profilePicture}
+                alt="Profile"
+                className="w-24 h-24 rounded-full cursor-pointer"
+                onClick={handleProfilePicClick}
+              />
+            ) : (
+              <div 
+                className="w-24 h-24 rounded-full cursor-pointer bg-gray-200 flex flex-col items-center justify-center text-gray-500"
+                onClick={handleProfilePicClick}
+              >
+                <User size={48} />
+                <span className="text-xs text-center">Click to add photo</span>
+              </div>
+            )}
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              onChange={handleFileChange} 
+              className="hidden" 
+              accept="image/*" 
             />
           </div>
+          <div>
+            <h1 className="text-3xl font-bold text-primary">{profile.username}</h1>
+            <p className="text-gray-500">{currentUser.role}</p>
+          </div>
+        </div>
+        <div className="flex space-x-2 mb-6">
+            <button onClick={handleProfilePicClick} className="bg-blue-500 text-white px-4 py-2 rounded-lg">Change Photo</button>
+            {profile.profilePicture && <button onClick={handleRemoveProfilePicture} className="bg-red-500 text-white px-4 py-2 rounded-lg">Remove Photo</button>}
+        </div>
+        
+        <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700">Phone Number</label>
-            <input
-              type="text"
-              name="phone"
-              value={profile.phone}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-lg"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Gender</label>
-            <select
-              name="gender"
-              value={profile.gender}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-lg"
-            >
-              <option value="">Select Gender</option>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-              <option value="other">Other</option>
-            </select>
+            <p className="text-lg">{profile.phone}</p>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">Address</label>
-            <textarea
-              name="address"
-              value={profile.address}
-              onChange={handleChange}
-              rows="3"
-              className="w-full px-4 py-2 border rounded-lg"
-            ></textarea>
+            <p className="text-lg">{profile.address}</p>
           </div>
-           <div>
-            <label className="block text-sm font-medium text-gray-700">Profile Picture URL</label>
-            <input
-              type="text"
-              name="profilePicture"
-              value={profile.profilePicture}
-              onChange={handleChange}
-              placeholder="https://example.com/image.png"
-              className="w-full px-4 py-2 border rounded-lg"
-            />
-          </div>
-          {error && <p className="text-red-500 text-sm">{error}</p>}
-          {success && <p className="text-green-500 text-sm">{success}</p>}
-          <button
-            type="submit"
-            className="w-full bg-primary text-white py-2 rounded-lg shadow-md hover:bg-green-700"
-          >
-            Update Profile
-          </button>
-        </form>
-      </div>
-       <div className="mt-6">
-        <Link to={getDashboardPath()} className="text-green-600 font-medium hover:underline">
-          &larr; Back to Dashboard
-        </Link>
+          {currentUser.role === 'farmer' && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Default Land Size</label>
+              <p className="text-lg">{profile.defaultLandSize} acres</p>
+            </div>
+          )}
+        </div>
+
+        <div className="mt-6">
+          <Link to="/edit-profile" className="inline-flex items-center px-4 py-2 bg-yellow-400 text-white rounded-lg shadow-md hover:bg-yellow-500">
+            <Edit className="mr-2" />
+            Edit Profile
+          </Link>
+        </div>
       </div>
     </div>
   );

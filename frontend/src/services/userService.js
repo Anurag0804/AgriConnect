@@ -33,6 +33,16 @@ export const updateUser = async (userId, userData) => {
   return res.data;
 };
 
+// Update a user's profile picture
+export const updateProfilePicture = async (userId, image) => {
+  const headers = getAuthHeader();
+  if (!headers.Authorization) {
+    throw new Error('No authorization token found. Please log in.');
+  }
+  const res = await http.put(`${API_URL}${userId}/profile-picture`, { image }, { headers });
+  return res.data;
+};
+
 
 // Get all users (admin only)
 export const getAllUsers = async (searchQuery = '') => {
