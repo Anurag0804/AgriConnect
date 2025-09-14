@@ -10,7 +10,17 @@ const userSchema = new mongoose.Schema({
   gender: { type: String, enum: ['male', 'female', 'other'] },
   address: { type: String },
   profilePicture: { type: String },
-  defaultLandSize: { type: Number }
+  defaultLandSize: { type: Number },
+  location: {
+    type: {
+      type: String,
+      enum: ['Point'],
+      default: 'Point',
+    },
+    coordinates: {
+      type: [Number], // [longitude, latitude]
+    },
+  },
 }, { timestamps: true });
 
 // Hash password before save
