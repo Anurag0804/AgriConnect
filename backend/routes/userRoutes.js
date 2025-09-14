@@ -65,6 +65,7 @@ router.put('/:id', protect, async (req, res) => {
       user.gender = req.body.gender || user.gender;
       user.address = req.body.address || user.address;
       user.profilePicture = req.body.profilePicture || user.profilePicture;
+      user.defaultLandSize = req.body.defaultLandSize || user.defaultLandSize;
       
       // Note: For actual file uploads, you would use middleware like 'multer' here
       // and handle the file object, e.g., saving the path to user.profilePicture.

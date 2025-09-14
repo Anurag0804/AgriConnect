@@ -1,21 +1,24 @@
 import { useState, useEffect } from 'react';
 import { getUser, updateUser } from '../services/userService';
 import { getCurrentUser } from '../services/authService';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
-export default function Profile() {
+export default function EditProfile() {
   const [profile, setProfile] = useState({
     username: '',
     phone: '',
-    gender: '',
     address: '',
-    profilePicture: ''
+    defaultLandSize: '',
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const navigate = useNavigate();
 
   const currentUser = getCurrentUser();
+
+  // 👀 Debug log
+  console.log("Fetched profile:", profile);
 
   useEffect(() => {
     if (!currentUser) {
@@ -30,9 +33,8 @@ export default function Profile() {
         setProfile({
           username: data.username || '',
           phone: data.phone || '',
-          gender: data.gender || '',
           address: data.address || '',
-          profilePicture: data.profilePicture || ''
+          defaultLandSize: data.defaultLandSize || '',
         });
       } catch (err) {
         setError('Failed to fetch profile data.');
@@ -43,10 +45,14 @@ export default function Profile() {
     };
 
     fetchProfile();
-  }, [currentUser]);
+  }, []); // ✅ run once on mount
 
   const handleChange = (e) => {
-    setProfile({ ...profile, [e.target.name]: e.target.value });
+    const { name, value, type } = e.target;
+    setProfile({
+      ...profile,
+      [name]: type === "number" ? Number(value) : value,
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -56,19 +62,10 @@ export default function Profile() {
     try {
       await updateUser(currentUser.userId, profile);
       setSuccess('Profile updated successfully!');
+      setTimeout(() => navigate('/profile'), 2000);
     } catch (err) {
       setError(err.response?.data?.error || 'Failed to update profile.');
       console.error(err);
-    }
-  };
-
-  const getDashboardPath = () => {
-    if (!currentUser) return "/";
-    switch (currentUser.role) {
-      case 'customer': return '/customer';
-      case 'farmer': return '/farmer';
-      case 'admin': return '/admin';
-      default: return '/';
     }
   };
 
@@ -102,20 +99,6 @@ export default function Profile() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Gender</label>
-            <select
-              name="gender"
-              value={profile.gender}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-lg"
-            >
-              <option value="">Select Gender</option>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-          <div>
             <label className="block text-sm font-medium text-gray-700">Address</label>
             <textarea
               name="address"
@@ -125,14 +108,13 @@ export default function Profile() {
               className="w-full px-4 py-2 border rounded-lg"
             ></textarea>
           </div>
-           <div>
-            <label className="block text-sm font-medium text-gray-700">Profile Picture URL</label>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Default Land Size (in acres)</label>
             <input
-              type="text"
-              name="profilePicture"
-              value={profile.profilePicture}
+              type="number"
+              name="defaultLandSize"
+              value={profile.defaultLandSize}
               onChange={handleChange}
-              placeholder="https://example.com/image.png"
               className="w-full px-4 py-2 border rounded-lg"
             />
           </div>
@@ -145,11 +127,11 @@ export default function Profile() {
             Update Profile
           </button>
         </form>
-      </div>
-       <div className="mt-6">
-        <Link to={getDashboardPath()} className="text-green-600 font-medium hover:underline">
-          &larr; Back to Dashboard
-        </Link>
+        <div className="mt-6">
+          <button onClick={() => navigate('/profile')} className="text-green-600 font-medium hover:underline">
+            &larr; Back to Profile
+          </button>
+        </div>
       </div>
     </div>
   );

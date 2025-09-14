@@ -12,6 +12,7 @@ import PurchaseHistory from "./pages/PurchaseHistory";
 import CustomerInventory from "./pages/CustomerInventory";
 import FarmerHistory from "./pages/FarmerHistory";
 import Profile from "./pages/Profile";
+import EditProfile from "./pages/EditProfile";
 import Orders from "./pages/Orders";
 import Receipts from "./pages/Receipts";
 import MyCart from "./pages/MyCart";
@@ -37,6 +38,14 @@ function App() {
               element={
                 <ProtectedRoute roles={["customer", "farmer", "admin"]}>
                   <Profile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/edit-profile"
+              element={
+                <ProtectedRoute roles={["customer", "farmer", "admin"]}>
+                  <EditProfile />
                 </ProtectedRoute>
               }
             />
