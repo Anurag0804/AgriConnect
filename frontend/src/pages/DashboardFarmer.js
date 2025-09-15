@@ -6,6 +6,7 @@ import { getFarmerTransactions } from '../services/transactionService';
 import { getCurrentUser } from '../services/authService';
 import { ArrowUpFromLine, History } from 'lucide-react';
 import { createReceipt } from '../services/receiptService';
+import WeatherCard from '../components/WeatherCard';
 
 export default function DashboardFarmer() {
   const [crops, setCrops] = useState([]);
@@ -123,6 +124,8 @@ export default function DashboardFarmer() {
           <p className="text-3xl font-bold text-red-600">{lastSale}</p>
         </div>
       </div>
+
+      <WeatherCard />
 
       {/* Incoming Orders Section */}
       <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 mb-8">

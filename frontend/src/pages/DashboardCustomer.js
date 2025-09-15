@@ -6,7 +6,7 @@ import GlobalContext from '../context/GlobalState';
 import { History, ShoppingCart } from 'lucide-react';
 import { buyCrop } from '../services/transactionService';
 import { Search, X } from 'lucide-react';
-
+import WeatherCard from '../components/WeatherCard';
 
 export default function DashboardCustomer() {
   const { fetchData } = useContext(GlobalContext);
@@ -178,6 +178,8 @@ export default function DashboardCustomer() {
           </button>
         </div>
       </div>
+
+      <WeatherCard />
 
       {loading && <p className="text-center mb-4">Loading crops...</p>}
       {error && <div className="text-center p-8 text-red-500">{error}</div>}

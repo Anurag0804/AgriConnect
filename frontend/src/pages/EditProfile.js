@@ -17,9 +17,6 @@ export default function EditProfile() {
 
   const currentUser = getCurrentUser();
 
-  // 👀 Debug log
-  console.log("Fetched profile:", profile);
-
   useEffect(() => {
     if (!currentUser) {
       setError("You must be logged in to view this page.");
@@ -45,14 +42,14 @@ export default function EditProfile() {
     };
 
     fetchProfile();
-  }, []); // ✅ run once on mount
+  }, [currentUser]); // Added currentUser to dependency array
 
   const handleChange = (e) => {
     const { name, value, type } = e.target;
-    setProfile({
-      ...profile,
+    setProfile((prevProfile) => ({
+      ...prevProfile,
       [name]: type === "number" ? Number(value) : value,
-    });
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -60,7 +57,13 @@ export default function EditProfile() {
     setError('');
     setSuccess('');
     try {
-      await updateUser(currentUser.userId, profile);
+      const profileData = {
+        username: profile.username,
+        phone: profile.phone,
+        address: profile.address,
+        defaultLandSize: profile.defaultLandSize,
+      };
+      await updateUser(currentUser.userId, profileData);
       setSuccess('Profile updated successfully!');
       setTimeout(() => navigate('/profile'), 2000);
     } catch (err) {
@@ -118,6 +121,7 @@ export default function EditProfile() {
               className="w-full px-4 py-2 border rounded-lg"
             />
           </div>
+
           {error && <p className="text-red-500 text-sm">{error}</p>}
           {success && <p className="text-green-500 text-sm">{success}</p>}
           <button
