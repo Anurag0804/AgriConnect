@@ -102,6 +102,7 @@ export default function Register() {
             >
               <option value="customer">Customer</option>
               <option value="farmer">Farmer</option>
+              <option value="vendor">Vendor</option>
               <option value="admin">Admin</option>
             </select>
           </div>

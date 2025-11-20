@@ -52,6 +52,18 @@ router.get('/customer', protect, authorize('customer'), async (req, res) => {
   }
 });
 
+// @desc    Get all orders for a vendor (not delivered)
+// @route   GET /api/orders/vendor
+// @access  Private (Vendor)
+router.get('/vendor', protect, authorize('vendor'), async (req, res) => {
+  try {
+    const orders = await Order.find({ vendor: req.user.id, status: { $ne: 'delivered' } }).populate('crop').populate('farmer').populate('customer');
+    res.json(orders);
+  } catch (error) {
+    res.status(500).json({ error: 'Server Error' });
+  }
+});
+
 // @desc    Update an order status
 // @route   PUT /api/orders/:id
 // @access  Private (Farmer)

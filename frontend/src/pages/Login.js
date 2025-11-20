@@ -21,6 +21,7 @@ export default function Login() {
       if (role === 'customer') navigate('/customer');
       else if (role === 'farmer') navigate('/farmer');
       else if (role === 'admin') navigate('/admin');
+      else if (role === 'vendor') navigate('/vendor');
       else navigate('/');
     } catch (err) {
       setError(err.response?.data?.error || "An error occurred during login.");

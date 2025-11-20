@@ -42,6 +42,16 @@ export const getCustomerOrders = async () => {
   return res.data;
 };
 
+// Get all orders for a vendor
+export const getMyDeliveries = async () => {
+  const headers = getAuthHeader();
+  if (!headers.Authorization) {
+    throw new Error('No authorization token found. Please log in.');
+  }
+  const res = await http.get(API_URL + 'vendor', { headers });
+  return res.data;
+};
+
 // Update an order status
 export const updateOrderStatus = async (orderId, status) => {
   const headers = getAuthHeader();

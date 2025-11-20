@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Link, useNavigate } from "react-router-dom";
 import { getCurrentUser } from "../services/authService";
-import { Users, Leaf, Shield } from "lucide-react"; // icons
+import { Users, Leaf, Shield, Truck } from "lucide-react"; // icons
 
 export default function Home() {
   const navigate = useNavigate();
@@ -19,6 +19,9 @@ export default function Home() {
         case 'admin':
           navigate('/admin');
           break;
+        case 'vendor':
+          navigate('/vendor');
+          break;
         default:
           navigate('/');
       }
@@ -34,8 +37,9 @@ export default function Home() {
         </h1>
         <p className="text-lg md:text-xl mb-8 text-gray-700 max-w-2xl mx-auto">
           A digital platform that bridges the gap between <span className="font-semibold">Farmers</span>,{" "}
-          <span className="font-semibold">Customers</span>, and{" "}
-          <span className="font-semibold">Admins</span> — making agriculture smarter and markets accessible.
+          <span className="font-semibold">Customers</span>,{" "}
+          <span className="font-semibold">Admins</span> and{" "}
+          <span className="font-semibold">Vendors</span> — making agriculture smarter and markets accessible.
         </p>
         <div className="space-x-4">
           <Link
@@ -54,7 +58,7 @@ export default function Home() {
       </section>
 
       {/* Role Cards Section */}
-      <section className="container mx-auto px-6 py-12 grid gap-8 md:grid-cols-3">
+      <section className="container mx-auto px-6 py-12 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
         {/* Farmer */}
         <div className="bg-white shadow-lg rounded-2xl p-6 hover:shadow-2xl transition text-center border border-gray-200">
           <Leaf className="w-12 h-12 text-green-600 mx-auto mb-4" />
@@ -70,6 +74,15 @@ export default function Home() {
           <h3 className="text-xl font-bold text-primary mb-2">For Customers</h3>
           <p className="text-gray-600">
             Get fresh produce directly from farmers, ensuring quality and transparency.
+          </p>
+        </div>
+
+        {/* Vendor */}
+        <div className="bg-white shadow-lg rounded-2xl p-6 hover:shadow-2xl transition text-center border border-gray-200">
+          <Truck className="w-12 h-12 text-blue-500 mx-auto mb-4" />
+          <h3 className="text-xl font-bold text-primary mb-2">For Vendors</h3>
+          <p className="text-gray-600">
+            Manage deliveries, track orders, and ensure timely transportation from farm to table.
           </p>
         </div>
 

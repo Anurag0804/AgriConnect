@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { createCrop, getFarmerCrops } from '../services/cropService';
 import { getFarmerOrders, updateOrderStatus } from '../services/orderService';
@@ -27,7 +27,7 @@ export default function DashboardFarmer() {
 
   const currentUser = getCurrentUser();
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     if (!currentUser) return;
     try {
       setLoading(true);
@@ -45,11 +45,11 @@ export default function DashboardFarmer() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentUser]);
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   const handleChange = (e) => {
     setNewCrop({ ...newCrop, [e.target.name]: e.target.value });
