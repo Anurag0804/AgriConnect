@@ -44,6 +44,8 @@ export default function Navbar() {
         return 'bg-yellow-500';
       case 'admin':
         return 'bg-[#8B5C2A]'; // Brown-magenta tone
+      case 'vendor':
+        return 'bg-[#1E3A8A]';
       default:
         return 'bg-primary';
     }
