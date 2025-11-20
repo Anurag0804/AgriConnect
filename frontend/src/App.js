@@ -22,6 +22,7 @@ import AdminInventoryManagement from "./pages/AdminInventoryManagement";
 import AdminTransactionHistory from "./pages/AdminTransactionHistory";
 import AdminOrderManagement from "./pages/AdminOrderManagement";
 import AdminReceiptManagement from "./pages/AdminReceiptManagement";
+import DashboardVendor from "./pages/DashboardVendor";
 
 function App() {
   return (
@@ -36,7 +37,7 @@ function App() {
             <Route
               path="/profile"
               element={
-                <ProtectedRoute roles={["customer", "farmer", "admin"]}>
+                <ProtectedRoute roles={["customer", "farmer", "admin", "vendor"]}>
                   <Profile />
                 </ProtectedRoute>
               }
@@ -44,7 +45,7 @@ function App() {
             <Route
               path="/edit-profile"
               element={
-                <ProtectedRoute roles={["customer", "farmer", "admin"]}>
+                <ProtectedRoute roles={["customer", "farmer", "admin", "vendor"]}>
                   <EditProfile />
                 </ProtectedRoute>
               }
@@ -98,6 +99,16 @@ function App() {
               element={
                 <ProtectedRoute roles={["farmer"]}>
                   <FarmerHistory />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Vendor Routes */}
+            <Route
+              path="/vendor"
+              element={
+                <ProtectedRoute roles={["vendor"]}>
+                  <DashboardVendor />
                 </ProtectedRoute>
               }
             />

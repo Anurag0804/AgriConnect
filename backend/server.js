@@ -34,6 +34,7 @@ app.use('/api/inventory', inventoryRoutes);
 app.use('/api/orders', require('./routes/orderRoutes'));
 app.use('/api/receipts', require('./routes/receiptRoutes'));
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/vendors', require('./routes/vendorRoutes'));
 
 const weatherRoutes = require('./routes/weatherRoutes');
 app.use('/api/weather', weatherRoutes);
